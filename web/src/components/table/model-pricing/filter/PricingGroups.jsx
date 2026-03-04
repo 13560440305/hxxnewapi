@@ -38,6 +38,7 @@ const PricingGroups = ({
   models = [],
   loading = false,
   t,
+  layout,
 }) => {
   const groups = [
     'all',
@@ -77,6 +78,7 @@ const PricingGroups = ({
       onChange={setFilterGroup}
       loading={loading}
       t={t}
+      layout={layout}
     />
   );
 };

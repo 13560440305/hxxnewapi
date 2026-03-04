@@ -34,6 +34,7 @@ const PricingQuotaTypes = ({
   models = [],
   loading = false,
   t,
+  layout,
 }) => {
   const qtyCount = (type) =>
     models.filter((m) => (type === 'all' ? true : m.quota_type === type))
@@ -53,6 +54,7 @@ const PricingQuotaTypes = ({
       onChange={setFilterQuotaType}
       loading={loading}
       t={t}
+      layout={layout}
     />
   );
 };

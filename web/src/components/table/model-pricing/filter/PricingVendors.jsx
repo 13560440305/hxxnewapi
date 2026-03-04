@@ -37,6 +37,7 @@ const PricingVendors = ({
   allModels = [],
   loading = false,
   t,
+  layout,
 }) => {
   // 获取系统中所有供应商（基于 allModels，如果未提供则退化为 models）
   const getAllVendors = React.useMemo(() => {
@@ -122,6 +123,7 @@ const PricingVendors = ({
       onChange={setFilterVendor}
       loading={loading}
       t={t}
+      layout={layout}
     />
   );
 };

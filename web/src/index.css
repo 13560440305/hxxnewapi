@@ -344,6 +344,17 @@ code {
   text-overflow: ellipsis;
 }
 
+.sbg-content-row {
+  width: auto;
+}
+
+.sbg-label-row {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+}
+
 /* Tabs组件样式 */
 .semi-tabs-content {
   padding: 0 !important;
@@ -814,9 +825,18 @@ html.dark .with-pastel-balls::before {
   z-index: 5;
 }
 
+/* 桌面端内容区内层：flex 列布局，使下方列表区域能获得剩余高度 */
+.pricing-content-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
 .pricing-view-container {
   flex: 1;
   overflow: auto;
+  min-height: 0;
 }
 
 .pricing-view-container-mobile {

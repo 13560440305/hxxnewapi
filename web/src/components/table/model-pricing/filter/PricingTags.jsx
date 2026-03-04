@@ -36,6 +36,7 @@ const PricingTags = ({
   allModels = [],
   loading = false,
   t,
+  layout,
 }) => {
   // 提取系统所有标签
   const getAllTags = React.useMemo(() => {
@@ -103,6 +104,7 @@ const PricingTags = ({
       onChange={setFilterTag}
       loading={loading}
       t={t}
+      layout={layout}
     />
   );
 };

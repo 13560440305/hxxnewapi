@@ -796,6 +796,7 @@ const DEFAULT_PRICING_FILTERS = {
   filterEndpointType: 'all',
   filterVendor: 'all',
   filterTag: 'all',
+  sortOrder: 'latest',
   currentPage: 1,
 };
 
@@ -811,6 +812,7 @@ export const resetPricingFilters = ({
   setFilterEndpointType,
   setFilterVendor,
   setFilterTag,
+  setSortOrder,
   setCurrentPage,
   setTokenUnit,
 }) => {
@@ -825,5 +827,6 @@ export const resetPricingFilters = ({
   setFilterEndpointType?.(DEFAULT_PRICING_FILTERS.filterEndpointType);
   setFilterVendor?.(DEFAULT_PRICING_FILTERS.filterVendor);
   setFilterTag?.(DEFAULT_PRICING_FILTERS.filterTag);
+  setSortOrder?.(DEFAULT_PRICING_FILTERS.sortOrder);
   setCurrentPage?.(DEFAULT_PRICING_FILTERS.currentPage);
 };

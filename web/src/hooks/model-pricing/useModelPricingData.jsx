@@ -39,6 +39,7 @@ export const useModelPricingData = () => {
   const [filterEndpointType, setFilterEndpointType] = useState('all'); // 端点类型筛选: 'all' | string
   const [filterVendor, setFilterVendor] = useState('all'); // 供应商筛选: 'all' | 'unknown' | string
   const [filterTag, setFilterTag] = useState('all'); // 模型标签筛选: 'all' | string
+  const [sortOrder, setSortOrder] = useState('latest'); // 排序: 'latest' | 'price_asc' | 'price_desc'
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [currency, setCurrency] = useState('USD');
@@ -160,6 +161,45 @@ export const useModelPricingData = () => {
     filterVendor,
     filterTag,
   ]);
+
+  // 按排序选项对筛选结果排序后输出
+  const sortedFilteredModels = useMemo(() => {
+    if (sortOrder === 'latest') return filteredModels;
+    const getUsedGroupRatio = (model) => {
+      if (
+        !Array.isArray(model.enable_groups) ||
+        model.enable_groups.length === 0
+      ) {
+        return 1;
+      }
+      let minRatio = Number.POSITIVE_INFINITY;
+      model.enable_groups.forEach((g) => {
+        const r = groupRatio[g];
+        if (r !== undefined && r < minRatio) {
+          minRatio = r;
+        }
+      });
+      return minRatio === Number.POSITIVE_INFINITY ? 1 : minRatio;
+    };
+    const getSortPrice = (model) => {
+      const usedGroupRatio = getUsedGroupRatio(model);
+      if (model.quota_type === 0) {
+        return (model.model_ratio ?? 0) * usedGroupRatio;
+      }
+      if (model.quota_type === 1) {
+        const p = parseFloat(model.model_price);
+        return Number.isFinite(p) ? p * usedGroupRatio : Number.POSITIVE_INFINITY;
+      }
+      return Number.POSITIVE_INFINITY;
+    };
+    const sorted = [...filteredModels].sort((a, b) => {
+      const pa = getSortPrice(a);
+      const pb = getSortPrice(b);
+      if (sortOrder === 'price_asc') return pa - pb;
+      return pb - pa;
+    });
+    return sorted;
+  }, [filteredModels, sortOrder, groupRatio]);
 
   const rowSelection = useMemo(
     () => ({
@@ -312,7 +352,7 @@ export const useModelPricingData = () => {
     refresh().then();
   }, []);
 
-  // 当筛选条件变化时重置到第一页
+  // 当筛选条件或排序变化时重置到第一页
   useEffect(() => {
     setCurrentPage(1);
   }, [
@@ -322,6 +362,7 @@ export const useModelPricingData = () => {
     filterVendor,
     filterTag,
     searchValue,
+    sortOrder,
   ]);
 
   return {
@@ -350,6 +391,8 @@ export const useModelPricingData = () => {
     setFilterVendor,
     filterTag,
     setFilterTag,
+    sortOrder,
+    setSortOrder,
     pageSize,
     setPageSize,
     currentPage,
@@ -370,7 +413,7 @@ export const useModelPricingData = () => {
     // 计算属性
     priceRate,
     usdExchangeRate,
-    filteredModels,
+    filteredModels: sortedFilteredModels,
     rowSelection,
 
     // 供应商

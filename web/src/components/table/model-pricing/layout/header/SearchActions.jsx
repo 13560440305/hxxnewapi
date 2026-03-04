@@ -42,6 +42,8 @@ const SearchActions = memo(
     tokenUnit,
     setTokenUnit,
     t,
+    leftLabel,
+    rightLabel,
   }) => {
     const handleCopyClick = useCallback(() => {
       if (copyText && selectedRowKeys.length > 0) {
@@ -62,8 +64,13 @@ const SearchActions = memo(
     }, [tokenUnit, setTokenUnit]);
 
     return (
-      <div className='flex items-center gap-2 w-full'>
-        <div className='flex-1'>
+      <div className='flex flex-wrap items-center gap-2 w-full'>
+        {leftLabel && (
+          <span className='text-sm font-medium text-semi-color-text-0 whitespace-nowrap'>
+            {leftLabel}
+          </span>
+        )}
+        <div className='flex-1 min-w-[120px]'>
           <Input
             prefix={<IconSearch />}
             placeholder={t('模糊搜索模型名称')}
@@ -74,6 +81,11 @@ const SearchActions = memo(
             showClear
           />
         </div>
+        {rightLabel != null && rightLabel !== '' && (
+          <span className='text-sm text-semi-color-text-1 whitespace-nowrap'>
+            {rightLabel}
+          </span>
+        )}
 
         <Button
           theme='outline'

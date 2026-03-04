@@ -70,8 +70,7 @@ const CONTENT_TEXTS = {
       ),
   },
   all: {
-    description: (t) =>
-      t('查看所有可用的AI模型供应商，包括众多知名供应商的模型。'),
+    description: () => '', // 已移除该行文案
   },
   fallback: {
     description: (t) => t('该供应商提供多种AI模型，适用于不同的应用场景。'),
@@ -344,14 +343,16 @@ const PricingVendorIntro = memo(
                       {t('共 {{count}} 个模型', { count })}
                     </Tag>
                   </div>
-                  <Paragraph
-                    className='text-xs sm:text-sm leading-relaxed !mb-0 cursor-pointer'
-                    style={COMPONENT_STYLES.descriptionText}
-                    ellipsis={{ rows: 2 }}
-                    onClick={() => handleOpenDescModal(description)}
-                  >
-                    {description}
-                  </Paragraph>
+                  {description ? (
+                    <Paragraph
+                      className='text-xs sm:text-sm leading-relaxed !mb-0 cursor-pointer'
+                      style={COMPONENT_STYLES.descriptionText}
+                      ellipsis={{ rows: 2 }}
+                      onClick={() => handleOpenDescModal(description)}
+                    >
+                      {description}
+                    </Paragraph>
+                  ) : null}
                 </div>
 
                 <div className='flex-shrink-0'>{rightContent}</div>
