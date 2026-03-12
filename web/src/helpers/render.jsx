@@ -96,8 +96,8 @@ import {
   SiSlack,
   SiTelegram,
   SiTwitch,
+  SiTwitter,
   SiWechat,
-  SiX,
 } from 'react-icons/si';
 
 // 获取侧边栏Lucide图标组件
@@ -502,8 +502,8 @@ const oauthProviderIconMap = {
   google: SiGoogle,
   discord: SiDiscord,
   facebook: SiFacebook,
-  x: SiX,
-  twitter: SiX,
+  x: SiTwitter,
+  twitter: SiTwitter,
   slack: SiSlack,
   telegram: SiTelegram,
   wechat: SiWechat,
