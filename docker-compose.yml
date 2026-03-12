@@ -1,23 +1,22 @@
-# New-API Docker Compose Configuration
-# 
-# Quick Start:
-#   1. docker-compose up -d
-#   2. Access at http://localhost:3000
+# hxxnewapi Docker Compose
+# 仓库: https://github.com/13560440305/hxxnewapi
 #
-# Using MySQL instead of PostgreSQL:
-#   1. Comment out the postgres service and SQL_DSN line 15
-#   2. Uncomment the mysql service and SQL_DSN line 16
-#   3. Uncomment mysql in depends_on (line 28)
-#   4. Uncomment mysql_data in volumes section (line 64)
+# 快速开始（本地构建并启动）:
+#   docker-compose up -d --build
+# 访问: http://localhost:3000
 #
-# ⚠️  IMPORTANT: Change all default passwords before deploying to production!
+# 使用 MySQL 替代 PostgreSQL 时，请取消 mysql 相关注释并注释 postgres。
+# ⚠️  生产环境务必修改默认密码！
 
-version: '3.4' # For compatibility with older Docker versions
+version: '3.4'
 
 services:
   new-api:
-    image: calciumion/new-api:latest
-    container_name: new-api
+    image: hxxnewapi:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hxxnewapi
     restart: always
     command: --log-dir /app/logs
     ports:

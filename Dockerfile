@@ -1,11 +1,14 @@
 FROM oven/bun:latest AS builder
 
 WORKDIR /build
+# 前端构建可能占用较多内存，避免 OOM
+ENV NODE_OPTIONS=--max-old-space-size=8192
+
 COPY web/package.json .
-COPY web/bun.lock .
 RUN bun install
 COPY ./web .
-COPY ./VERSION .
+COPY VERSION .
+RUN if [ ! -s VERSION ]; then echo 'v0.0.0' > VERSION; fi
 RUN DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION=$(cat VERSION) bun run build
 
 FROM golang:alpine AS builder2
@@ -23,6 +26,7 @@ RUN go mod download
 
 COPY . .
 COPY --from=builder /build/dist ./web/dist
+RUN if [ ! -s VERSION ]; then echo 'v0.0.0' > VERSION; fi
 RUN go build -ldflags "-s -w -X 'github.com/QuantumNous/new-api/common.Version=$(cat VERSION)'" -o new-api
 
 FROM debian:bookworm-slim
