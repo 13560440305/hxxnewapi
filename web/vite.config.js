@@ -29,7 +29,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // 保证 @lobehub/icons 内部对 antd 的引用从项目根 node_modules 解析（Linux 下需显式指定）
+      antd: path.resolve(__dirname, 'node_modules/antd'),
     },
+    dedupe: ['antd'],
   },
   plugins: [
     codeInspectorPlugin({
