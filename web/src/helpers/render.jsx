@@ -96,7 +96,6 @@ import {
   SiSlack,
   SiTelegram,
   SiTwitch,
-  SiTwitter,
   SiWechat,
 } from 'react-icons/si';
 
@@ -502,8 +501,6 @@ const oauthProviderIconMap = {
   google: SiGoogle,
   discord: SiDiscord,
   facebook: SiFacebook,
-  x: SiTwitter,
-  twitter: SiTwitter,
   slack: SiSlack,
   telegram: SiTelegram,
   wechat: SiWechat,
