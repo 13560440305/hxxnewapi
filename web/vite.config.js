@@ -29,10 +29,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      // @lobehub/icons 内部会 require antd，项目使用 Semi UI。用 stub 替代 antd，保证 Linux 下可构建且不引入整包 antd
-      antd: path.resolve(__dirname, 'src/stub-antd.js'),
     },
-    dedupe: ['antd'],
   },
   plugins: [
     codeInspectorPlugin({

@@ -88,8 +88,6 @@ import {
   SiGithub,
   SiGitlab,
   SiGoogle,
-  SiKeycloak,
-  SiLinkedin,
   SiNextcloud,
   SiNotion,
   SiOkta,
@@ -504,13 +502,11 @@ const oauthProviderIconMap = {
   google: SiGoogle,
   discord: SiDiscord,
   facebook: SiFacebook,
-  linkedin: SiLinkedin,
   x: SiX,
   twitter: SiX,
   slack: SiSlack,
   telegram: SiTelegram,
   wechat: SiWechat,
-  keycloak: SiKeycloak,
   nextcloud: SiNextcloud,
   authentik: SiAuthentik,
   openid: SiOpenid,
@@ -546,7 +542,7 @@ function normalizeOAuthIconKey(raw) {
 /**
  * Render custom OAuth provider icon with react-icons or URL/emoji fallback.
  * Supported formats:
- * - react-icons simple key: github / gitlab / google / keycloak
+ * - react-icons simple key: github / gitlab / google
  * - prefixed key: ri:github / si:github
  * - full URL image: https://example.com/logo.png
  * - emoji: 🐱
