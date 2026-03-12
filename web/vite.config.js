@@ -29,8 +29,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      // 保证 @lobehub/icons 内部对 antd 的引用从项目根 node_modules 解析（Linux 下需显式指定）
-      antd: path.resolve(__dirname, 'node_modules/antd'),
+      // @lobehub/icons 内部会 require antd，项目使用 Semi UI。用 stub 替代 antd，保证 Linux 下可构建且不引入整包 antd
+      antd: path.resolve(__dirname, 'src/stub-antd.js'),
     },
     dedupe: ['antd'],
   },
