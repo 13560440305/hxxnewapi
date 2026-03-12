@@ -29,6 +29,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // semi-ui 的 package exports 未包含 dist/css/semi.css，直接解析到 node_modules 内文件（兼容 Linux 等环境）
+      '@douyinfe/semi-ui/dist/css/semi.css': path.resolve(__dirname, 'node_modules/@douyinfe/semi-ui/dist/css/semi.css'),
     },
   },
   plugins: [
