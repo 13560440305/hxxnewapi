@@ -93,3 +93,36 @@ make build
 ```
 
 生成的可执行文件会内嵌 `web/dist`，直接运行即可提供完整服务。
+
+// 创建桥接网络
+docker network create hxxnet
+
+
+// mysql 运行容器命令
+docker run -d \
+  --name mysql8 \
+  --network hxxnet \
+  -e MYSQL_ROOT_PASSWORD=ABC123### \
+  -p 3306:3306 \
+  mysql:8.0
+
+// redis 运行容器命令
+docker rm -f redisd
+
+docker run -d \
+  --name redisd \
+  --network hxxnet \
+  -p 6379:6379 \
+  redis:latest \
+  redis-server --requirepass "ABC123###"
+
+# hxxnewapid
+docker run -d \
+  --name hxxnewapid \
+  --network hxxnet \
+  -p 3000:3000 \
+  hxxnewapi:latest
+
+
+// 打包容器发布（导出镜像）
+
