@@ -169,7 +169,7 @@ const Home = () => {
                   <h1
                     className={`text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-semi-color-text-0 leading-tight ${isChinese ? 'tracking-wide md:tracking-wider' : ''}`}
                   >
-                    <span className='shine-text'>{t('星游大模型网关')}</span>
+                    <span className='shine-text'>{t('星游开放平台')}</span>
                   </h1>
                   <p className='text-base md:text-lg lg:text-xl text-semi-color-text-1 mt-4 md:mt-6 max-w-xl'>
                     {t('更好的价格，更好的稳定性，只需要将模型基址替换为：')}

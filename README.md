@@ -97,6 +97,12 @@ make build
 // 创建桥接网络
 docker network create hxxnet
 
+// 查看桥接网络信息
+docker network ls
+
+// 删除网络
+docker network rm hxxnet
+
 
 // mysql 运行容器命令
 docker run -d \
@@ -113,6 +119,8 @@ docker run -d \
   --name redisd \
   --network hxxnet \
   -p 6379:6379 \
+  -v /data/redis:/data \
+  --restart always \
   redis:latest \
   redis-server --requirepass "ABC123###"
 
@@ -125,4 +133,24 @@ docker run -d \
 
 
 // 打包容器发布（导出镜像）
+
+---
+
+## 文档与 GitHub Pages
+
+`docs/` 目录可通过 GitHub Pages 发布为在线文档站（带侧栏与搜索）。
+
+**启用步骤：**
+
+1. 打开仓库 **Settings → Pages**。
+2. **Source** 选择 **Deploy from a branch**。
+3. **Branch** 选 `main`，**Folder** 选 **/docs**，保存。
+4. 等待 1～2 分钟，访问：**https://13560440305.github.io/hxxnewapi/**
+
+本地预览文档站（需先进入 `docs` 目录）：
+
+```bash
+npx docsify-cli serve docs
+# 浏览器打开 http://localhost:3000
+```
 
