@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>跳转中…</title>
+</head>
+<body>
+  <p>正在跳转到文档首页…</p>
+  <script>
+    (function () {
+      var path = location.pathname.replace(/\/$/, '');
+      var base = path.indexOf('/hxxnewapi') !== -1 ? '/hxxnewapi' : '';
+      location.replace(location.origin + base + '/');
+    })();
+  </script>
+</body>
+</html>

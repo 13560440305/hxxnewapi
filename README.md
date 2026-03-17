@@ -147,10 +147,20 @@ docker run -d \
 3. **Branch** 选 `main`，**Folder** 选 **/docs**，保存。
 4. 等待 1～2 分钟，访问：**https://13560440305.github.io/hxxnewapi/**
 
-本地预览文档站（需先进入 `docs` 目录）：
+**本地预览文档站**（已安装 [docsify-cli](https://www.npmjs.com/package/docsify-cli) 时）：
+
+在项目根目录执行：
 
 ```bash
-npx docsify-cli serve docs
-# 浏览器打开 http://localhost:3000
+docsify serve docs
 ```
+
+或在 `docs` 目录下执行：
+
+```bash
+cd docs
+docsify serve .
+```
+
+浏览器打开 **http://localhost:3000** 即可。未安装时可用 `npx docsify-cli serve docs`。
 

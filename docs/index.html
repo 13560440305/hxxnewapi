@@ -3,23 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hxxnewapi 文档</title>
+  <title>星游开放平台 - 文档</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
 </head>
 <body>
   <div id="app">加载中…</div>
   <script>
-    window.$docsify = {
-      name: 'hxxnewapi 文档',
-      basePath: '/hxxnewapi/',
-      loadSidebar: 'sidebar.md',
-      subMaxLevel: 2,
-      auto2top: true,
-      homepage: 'README.md',
-      search: 'auto',
-      formatUpdated: '{YYYY}-{MM}-{DD} {HH}:{mm}',
-      copyCode: true,
-    };
+    (function () {
+      var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      window.$docsify = {
+        name: '星游开放平台 文档',
+        basePath: isLocal ? '/' : '/hxxnewapi/',
+        loadSidebar: 'sidebar.md',
+        subMaxLevel: 1,
+        auto2top: true,
+        homepage: '产品介绍.md',
+        search: 'auto',
+        formatUpdated: '{YYYY}-{MM}-{DD} {HH}:{mm}',
+        copyCode: true,
+      };
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
