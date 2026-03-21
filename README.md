@@ -171,4 +171,7 @@ npx http-server docs -p 3000
 
 浏览器打开 http://localhost:3000/cn/
 
+vercel发布地址
+https://hxxnewapi.vercel.app/
+
 
