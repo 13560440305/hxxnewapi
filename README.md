@@ -164,9 +164,11 @@ docsify serve .
 
 浏览器打开 **http://localhost:3000** 即可。未安装时可用 `npx docsify-cli serve docs`。
 
-npx http-server "d:\curProject\h2x\hxxassist\hxxnewapi\docs" -p 3000
+本地测试建议：
+使用 
 
-npx serve "d:\curProject\h2x\hxxassist\hxxnewapi\docs\cn" -l 3000 --single
+npx http-server docs -p 3000
 
+浏览器打开 http://localhost:3000/cn/
 
 
