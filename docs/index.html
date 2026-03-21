@@ -27,7 +27,7 @@
   <script>
     (function () {
       var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-      var base = isLocal ? '' : '/hxxnewapi';
+      var base = isLocal ? '' : '';
       document.getElementById('link-cn').href = base + '/cn/';
       document.getElementById('link-en').href = base + '/en/';
       if (isLocal) document.getElementById('local-tip').style.display = 'block';
