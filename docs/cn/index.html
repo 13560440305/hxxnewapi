@@ -20,8 +20,8 @@
       var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
       // 纠正错误 pathname：点击侧栏后 pathname 变成 /cn/API导航、/API导航 等，导致 basePath 错、sidebar 404、一直「加载中」。统一回退到 /cn/ 或 / 并保留 hash。
       var path = location.pathname.replace(/\/$/, '');
-      if (path && path !== '/' && path !== '/cn' && path !== '/cn') {
-        var base = (path.indexOf('/cn/') === 0 || path === '/cn') ? '/cn/' : '/';
+      if (path && path !== '/' && path !== '/cn' && path !== '/hxxnewapi' && path !== '/hxxnewapi/cn') {
+        var base = (path.indexOf('/cn/') === 0 || path === '/cn' || path.indexOf('/hxxnewapi/cn/') === 0 || path === '/hxxnewapi/cn') ? (isLocal ? '/cn/' : '/hxxnewapi/cn/') : (isLocal ? '/' : '/hxxnewapi');
         location.replace(location.origin + base + (location.hash || '#/'));
         return;
       }
