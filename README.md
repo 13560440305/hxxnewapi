@@ -108,7 +108,7 @@ docker network rm hxxnet
 docker run -d \
   --name mysql8 \
   --network hxxnet \
-  -e MYSQL_ROOT_PASSWORD=ABC123### \
+  -e MYSQL_ROOT_PASSWORD=123456 \
   -p 3306:3306 \
   mysql:8.0
 
@@ -122,7 +122,7 @@ docker run -d \
   -v /data/redis:/data \
   --restart always \
   redis:latest \
-  redis-server --requirepass "ABC123###"
+  redis-server --requirepass "123456"
 
 # hxxnewapid
 docker run -d \
@@ -132,46 +132,5 @@ docker run -d \
   hxxnewapi:latest
 
 
-// 打包容器发布（导出镜像）
-
----
-
-## 文档与 GitHub Pages
-
-`docs/` 目录可通过 GitHub Pages 发布为在线文档站（带侧栏与搜索）。
-
-**启用步骤：**
-
-1. 打开仓库 **Settings → Pages**。
-2. **Source** 选择 **Deploy from a branch**。
-3. **Branch** 选 `main`，**Folder** 选 **/docs**，保存。
-4. 等待 1～2 分钟，访问：**https://13560440305.github.io/hxxnewapi/**
-
-**本地预览文档站**（已安装 [docsify-cli](https://www.npmjs.com/package/docsify-cli) 时）：
-
-在项目根目录执行：
-
-```bash
-docsify serve docs
-```
-
-或在 `docs` 目录下执行：
-
-```bash
-cd docs
-docsify serve .
-```
-
-浏览器打开 **http://localhost:3000** 即可。未安装时可用 `npx docsify-cli serve docs`。
-
-本地测试建议：
-使用 
-
-npx http-server docs -p 3000
-
-浏览器打开 http://localhost:3000/cn/
-
-vercel发布地址
-https://hxxnewapi.vercel.app/
 
 
