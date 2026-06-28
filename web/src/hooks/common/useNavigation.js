@@ -18,10 +18,10 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import { useMemo } from 'react';
+import { resolveDocsLink } from '../../helpers/docsLink';
 
 export const useNavigation = (t, docsLink, headerNavModules) => {
   const mainNavLinks = useMemo(() => {
-    // 默认配置，如果没有传入配置则显示所有模块
     const defaultModules = {
       home: true,
       console: true,
@@ -30,8 +30,8 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
       about: true,
     };
 
-    // 使用传入的配置或默认配置
     const modules = headerNavModules || defaultModules;
+    const docs = resolveDocsLink(docsLink);
 
     const allLinks = [
       {
@@ -51,12 +51,19 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
       },
       ...(docsLink
         ? [
-            {
-              text: t('文档'),
-              itemKey: 'docs',
-              isExternal: true,
-              externalLink: docsLink,
-            },
+            docs.isExternal
+              ? {
+                  text: t('文档'),
+                  itemKey: 'docs',
+                  isExternal: true,
+                  externalLink: docs.href,
+                }
+              : {
+                  text: t('文档'),
+                  itemKey: 'docs',
+                  to: docs.href,
+                  fullPage: docs.fullPage,
+                },
           ]
         : []),
       {

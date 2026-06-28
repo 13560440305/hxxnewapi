@@ -40,6 +40,7 @@ const Navigation = ({
     }
     if (link.itemKey === 'pricing') return location.pathname === '/pricing';
     if (link.itemKey === 'about') return location.pathname === '/about';
+    if (link.itemKey === 'docs') return location.pathname.startsWith('/docs');
     return location.pathname === targetPath;
   };
 
@@ -80,6 +81,19 @@ const Navigation = ({
 
       const active = isLinkActive(link, targetPath);
       const marketplaceClassName = `headerbar-nav-link${active ? ' active' : ''}`;
+
+      // 内置文档为独立 Docsify 页面，必须整页跳转，不能用 React Router
+      if (link.fullPage) {
+        return (
+          <a
+            key={link.itemKey}
+            href={targetPath}
+            className={isMarketplace ? marketplaceClassName : commonLinkClasses}
+          >
+            {linkContent}
+          </a>
+        );
+      }
 
       return (
         <Link

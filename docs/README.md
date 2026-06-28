@@ -1,12 +1,12 @@
-# hxxnewapi 文档
+# 项目文档
 
-本目录包含项目文档，可通过 [GitHub Pages](https://13560440305.github.io/hxxnewapi/) 在线浏览（在仓库 Settings → Pages 中启用「Deploy from a branch」并选择 `/docs` 目录）。
+本目录包含用户文档与开发资料，随主程序在 **/docs** 路径提供（无需单独部署静态站）。
 
-- **本地开发与启动**：环境配置、启动命令、故障排查（[cn/本地开发与启动.md](./cn/本地开发与启动.md)）
+- **本地开发与启动**：[本地开发与启动.md](./本地开发与启动.md)
 - **翻译术语表**：中/法/俄术语对照
-- **渠道额外设置**：各渠道的额外配置说明
-- **安装说明**：宝塔等部署方式
-- **OpenAPI**：后台 API 与 Relay API 规范
+- **渠道额外设置**：各渠道的额外配置说明（`channel/`）
+- **安装说明**：宝塔等部署方式（`installation/`）
+- **OpenAPI**：后台 API 与 Relay API 规范（`openapi/`）
 - **IONet**：IONet 接口示例
 
-左侧栏可切换各文档。
+在线浏览时左侧栏由 `sidebar.md` 配置；修改 Markdown 后重启后端（`DEBUG=true` 时从磁盘读取）即可生效。

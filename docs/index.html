@@ -4,34 +4,98 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>星游开放平台 - 文档</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-sidebar-collapse@1.3.5/dist/sidebar.min.css" />
+  <link rel="stylesheet" href="/docs/docs-chrome.css" />
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 720px; margin: 80px auto; padding: 0 20px; }
-    h1 { font-size: 1.6rem; margin: 0 0 12px; }
-    p { color: #666; line-height: 1.6; }
-    .btns { margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; }
-    a.btn { display: inline-block; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; text-decoration: none; color: #111; }
-    a.btn:hover { border-color: #42b983; background: #f8fffe; }
-    code { background: #f6f8fa; padding: 2px 6px; border-radius: 6px; }
+    .sidebar .sidebar-nav ul ul ul {
+      display: none !important;
+    }
   </style>
 </head>
-<body>
-  <h1>星游开放平台 - 文档</h1>
-  <p>选择语言 / Select language</p>
-  <div class="btns">
-    <a id="link-cn" class="btn" href="#">中文</a>
-    <a id="link-en" class="btn" href="#">English</a>
-  </div>
-  <p id="local-tip" style="display:none;margin-top:18px;">
-    本地调试请运行：<code>docsify serve docs/cn</code>（中文）或 <code>docsify serve docs/en</code>（英文占位），然后访问启动后提示的地址（通常是 <code>http://localhost:3000/</code>）。
-  </p>
+<body class="docs-with-chrome">
+  <header class="docs-top-bar" id="docs-top-bar" aria-label="文档导航"></header>
+  <div id="app">加载中…</div>
   <script>
     (function () {
-      var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-      var base = isLocal ? '' : '';
-      document.getElementById('link-cn').href = base + '/cn/';
-      document.getElementById('link-en').href = base + '/en/';
-      if (isLocal) document.getElementById('local-tip').style.display = 'block';
+      var DOC_LOCALES = {
+        'zh-CN': {
+          backHome: '返回产品首页',
+          searchPlaceholder: '输入关键词搜索',
+          searchNoData: '没有找到结果',
+          loading: '加载中…',
+        },
+        en: {
+          backHome: 'Back to home',
+          searchPlaceholder: 'Type to search',
+          searchNoData: 'No results found',
+          loading: 'Loading…',
+        },
+      };
+
+      function resolveDocLocale() {
+        var lang = (document.documentElement.lang || 'zh-CN').toLowerCase();
+        if (lang.indexOf('zh') === 0) return DOC_LOCALES['zh-CN'];
+        if (lang.indexOf('en') === 0) return DOC_LOCALES.en;
+        return DOC_LOCALES['zh-CN'];
+      }
+
+      var locale = resolveDocLocale();
+      var appEl = document.getElementById('app');
+      if (appEl) appEl.textContent = locale.loading;
+
+      var topBar = document.getElementById('docs-top-bar');
+      if (topBar) {
+        topBar.innerHTML =
+          '<a class="docs-back-link" href="/"><span aria-hidden="true">←</span> ' +
+          locale.backHome +
+          '</a>';
+      }
+
+      // 对外公开的文档（不含平台接口）
+      var publicDocPaths = [
+        '产品介绍.md',
+        '快速开始.md',
+        '本地开发与启动.md',
+        'API导航.md',
+        '音频.md',
+        '聊天.md',
+        '补全.md',
+        '图像.md',
+        '模型.md',
+        '审查.md',
+        '实时语音.md',
+        '重排序.md',
+        '视频.md',
+        '服务条款.md',
+        '隐私政策.md',
+      ];
+
+      window.$docsify = {
+        name: '',
+        basePath: '/docs/',
+        routerMode: 'hash',
+        loadSidebar: 'sidebar.md',
+        subMaxLevel: 2,
+        sidebarDisplayLevel: 0,
+        auto2top: true,
+        homepage: '产品介绍.md',
+        search: {
+          paths: publicDocPaths,
+          placeholder: locale.searchPlaceholder,
+          noData: locale.searchNoData,
+          depth: 6,
+          hideOtherSidebarContent: false,
+        },
+        formatUpdated: '{YYYY}-{MM}-{DD} {HH}:{mm}',
+        copyCode: true,
+      };
     })();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-sidebar-collapse@1.3.5/dist/docsify-sidebar-collapse.min.js"></script>
 </body>
 </html>

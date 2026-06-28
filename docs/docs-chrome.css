@@ -1,0 +1,56 @@
+/* 文档顶栏「返回产品首页」— 独立于 Docsify 侧栏，始终可见 */
+.docs-top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  z-index: 99999;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.docs-top-bar .docs-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ea580c;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.docs-top-bar .docs-back-link:hover {
+  color: #c2410c;
+}
+
+/* 为顶栏腾出空间 */
+body.docs-with-chrome .sidebar {
+  top: 48px !important;
+  bottom: 0;
+  height: auto !important;
+  padding-top: 16px !important;
+}
+
+body.docs-with-chrome .content {
+  top: 48px !important;
+}
+
+body.docs-with-chrome .progress {
+  top: 48px !important;
+}
+
+body.docs-with-chrome.sticky .sidebar {
+  top: 48px !important;
+}
+
+@media screen and (max-width: 768px) {
+  body.docs-with-chrome .content {
+    padding-top: 68px !important;
+  }
+}

@@ -89,10 +89,14 @@ export default defineConfig({
       },
     },
   },
-  server: {
+    server: {
     host: '0.0.0.0',
     proxy: {
       '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/docs': {
         target: 'http://localhost:3000',
         changeOrigin: true,
       },

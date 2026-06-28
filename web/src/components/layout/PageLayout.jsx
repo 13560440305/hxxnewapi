@@ -169,6 +169,7 @@ const PageLayout = () => {
               border: 'none',
               paddingRight: '0',
               width: 'var(--sidebar-current-width)',
+              overflow: 'hidden',
             }}
           >
             <SiderBar

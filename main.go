@@ -37,6 +37,9 @@ import (
 //go:embed web/dist
 var buildFS embed.FS
 
+//go:embed docs
+var docsFS embed.FS
+
 //go:embed web/dist/index.html
 var indexPage []byte
 
@@ -180,7 +183,7 @@ func main() {
 	InjectGoogleAnalytics()
 
 	// 设置路由
-	router.SetRouter(server, buildFS, indexPage)
+	router.SetRouter(server, buildFS, docsFS, indexPage)
 	var port = os.Getenv("PORT")
 	if port == "" {
 		port = strconv.Itoa(*common.Port)
