@@ -38,8 +38,10 @@ const UserArea = ({
   logout,
   navigate,
   t,
+  variant = 'default',
 }) => {
   const dropdownRef = useRef(null);
+  const isMarketplace = variant === 'marketplace';
   if (isLoading) {
     return (
       <SkeletonWrapper
@@ -52,69 +54,91 @@ const UserArea = ({
   }
 
   if (userState.user) {
+    const menu = (
+      <Dropdown.Menu className='!bg-semi-color-bg-overlay !border-semi-color-border !shadow-lg !rounded-lg dark:!bg-gray-700 dark:!border-gray-600'>
+        <Dropdown.Item
+          onClick={() => {
+            navigate('/console/personal');
+          }}
+          className='!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white'
+        >
+          <div className='flex items-center gap-2'>
+            <IconUserSetting
+              size='small'
+              className='text-gray-500 dark:text-gray-400'
+            />
+            <span>{t('个人设置')}</span>
+          </div>
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            navigate('/console/token');
+          }}
+          className='!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white'
+        >
+          <div className='flex items-center gap-2'>
+            <IconKey
+              size='small'
+              className='text-gray-500 dark:text-gray-400'
+            />
+            <span>{t('令牌管理')}</span>
+          </div>
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            navigate('/console/topup');
+          }}
+          className='!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white'
+        >
+          <div className='flex items-center gap-2'>
+            <IconCreditCard
+              size='small'
+              className='text-gray-500 dark:text-gray-400'
+            />
+            <span>{t('钱包管理')}</span>
+          </div>
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={logout}
+          className='!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-red-500 dark:hover:!text-white'
+        >
+          <div className='flex items-center gap-2'>
+            <IconExit
+              size='small'
+              className='text-gray-500 dark:text-gray-400'
+            />
+            <span>{t('退出')}</span>
+          </div>
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    );
+
+    if (isMarketplace) {
+      return (
+        <div className='relative' ref={dropdownRef}>
+          <Dropdown
+            position='bottomRight'
+            getPopupContainer={() => dropdownRef.current}
+            render={menu}
+          >
+            <button
+              type='button'
+              className='headerbar-nav-avatar'
+              aria-label={userState.user.username}
+            >
+              {userState.user.username[0].toUpperCase()}
+            </button>
+          </Dropdown>
+        </div>
+      );
+    }
+
     return (
       <div className='relative' ref={dropdownRef}>
         <Dropdown
           position='bottomRight'
           getPopupContainer={() => dropdownRef.current}
-          render={
-            <Dropdown.Menu className='!bg-semi-color-bg-overlay !border-semi-color-border !shadow-lg !rounded-lg dark:!bg-gray-700 dark:!border-gray-600'>
-              <Dropdown.Item
-                onClick={() => {
-                  navigate('/console/personal');
-                }}
-                className='!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white'
-              >
-                <div className='flex items-center gap-2'>
-                  <IconUserSetting
-                    size='small'
-                    className='text-gray-500 dark:text-gray-400'
-                  />
-                  <span>{t('个人设置')}</span>
-                </div>
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => {
-                  navigate('/console/token');
-                }}
-                className='!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white'
-              >
-                <div className='flex items-center gap-2'>
-                  <IconKey
-                    size='small'
-                    className='text-gray-500 dark:text-gray-400'
-                  />
-                  <span>{t('令牌管理')}</span>
-                </div>
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => {
-                  navigate('/console/topup');
-                }}
-                className='!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-blue-500 dark:hover:!text-white'
-              >
-                <div className='flex items-center gap-2'>
-                  <IconCreditCard
-                    size='small'
-                    className='text-gray-500 dark:text-gray-400'
-                  />
-                  <span>{t('钱包管理')}</span>
-                </div>
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={logout}
-                className='!px-3 !py-1.5 !text-sm !text-semi-color-text-0 hover:!bg-semi-color-fill-1 dark:!text-gray-200 dark:hover:!bg-red-500 dark:hover:!text-white'
-              >
-                <div className='flex items-center gap-2'>
-                  <IconExit
-                    size='small'
-                    className='text-gray-500 dark:text-gray-400'
-                  />
-                  <span>{t('退出')}</span>
-                </div>
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          }
+          render={menu}
         >
           <Button
             theme='borderless'
@@ -143,6 +167,21 @@ const UserArea = ({
     );
   } else {
     const showRegisterButton = !isSelfUseMode;
+
+    if (isMarketplace) {
+      return (
+        <div className='flex items-center gap-1'>
+          <Link to='/login' className='headerbar-auth-link'>
+            {t('登录')}
+          </Link>
+          {showRegisterButton && !isMobile && (
+            <Link to='/register' className='headerbar-auth-link primary'>
+              {t('注册')}
+            </Link>
+          )}
+        </div>
+      );
+    }
 
     const commonSizingAndLayoutClass =
       'flex items-center justify-center !py-[10px] !px-1.5';

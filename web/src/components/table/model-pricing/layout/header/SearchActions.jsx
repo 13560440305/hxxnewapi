@@ -5,26 +5,26 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
 */
 
 import React, { memo, useCallback } from 'react';
-import { Input, Button, Switch, Select, Divider } from '@douyinfe/semi-ui';
-import { IconSearch, IconCopy, IconFilter } from '@douyinfe/semi-icons';
+import { Select } from '@douyinfe/semi-ui';
+import { IconSearch } from '@douyinfe/semi-icons';
+import { LayoutGrid, Table2 } from 'lucide-react';
+
+const MarketplaceToggle = ({ checked, onChange, label }) => (
+  <button
+    type='button'
+    className={`mp-toggle${checked ? ' on' : ''}`}
+    role='switch'
+    aria-checked={checked}
+    aria-label={label}
+    onClick={() => onChange(!checked)}
+  />
+);
 
 const SearchActions = memo(
   ({
-    selectedRowKeys = [],
-    copyText,
     handleChange,
     handleCompositionStart,
     handleCompositionEnd,
@@ -39,127 +39,108 @@ const SearchActions = memo(
     setShowRatio,
     viewMode,
     setViewMode,
-    tokenUnit,
-    setTokenUnit,
     t,
-    leftLabel,
-    rightLabel,
   }) => {
-    const handleCopyClick = useCallback(() => {
-      if (copyText && selectedRowKeys.length > 0) {
-        copyText(selectedRowKeys);
-      }
-    }, [copyText, selectedRowKeys]);
-
     const handleFilterClick = useCallback(() => {
       setShowFilterModal?.(true);
     }, [setShowFilterModal]);
 
-    const handleViewModeToggle = useCallback(() => {
-      setViewMode?.(viewMode === 'table' ? 'card' : 'table');
-    }, [viewMode, setViewMode]);
+    const searchInput = (
+      <div className='mp-search-wrap'>
+        <span className='mp-search-icon'>
+          <IconSearch />
+        </span>
+        <input
+          type='search'
+          className='mp-search-input'
+          placeholder={t('搜索模型...')}
+          value={searchValue}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
+          onChange={(e) => handleChange(e.target.value)}
+        />
+      </div>
+    );
 
-    const handleTokenUnitToggle = useCallback(() => {
-      setTokenUnit?.(tokenUnit === 'K' ? 'M' : 'K');
-    }, [tokenUnit, setTokenUnit]);
-
-    return (
-      <div className='flex flex-wrap items-center gap-2 w-full'>
-        {leftLabel && (
-          <span className='text-sm font-medium text-semi-color-text-0 whitespace-nowrap'>
-            {leftLabel}
-          </span>
-        )}
-        <div className='flex-1 min-w-[120px]'>
-          <Input
-            prefix={<IconSearch />}
-            placeholder={t('模糊搜索模型名称')}
-            value={searchValue}
-            onCompositionStart={handleCompositionStart}
-            onCompositionEnd={handleCompositionEnd}
-            onChange={handleChange}
-            showClear
+    const viewControls = (
+      <>
+        <div className='mp-toggle-group'>
+          <span>{t('充值价格显示')}</span>
+          <MarketplaceToggle
+            checked={showWithRecharge}
+            onChange={setShowWithRecharge}
+            label={t('充值价格显示')}
           />
         </div>
-        {rightLabel != null && rightLabel !== '' && (
-          <span className='text-sm text-semi-color-text-1 whitespace-nowrap'>
-            {rightLabel}
-          </span>
+
+        {showWithRecharge && (
+          <Select
+            value={currency}
+            onChange={setCurrency}
+            optionList={[
+              { value: 'USD', label: 'USD' },
+              { value: 'CNY', label: 'CNY' },
+              { value: 'CUSTOM', label: t('自定义货币') },
+            ]}
+            style={{ width: 100 }}
+          />
         )}
 
-        <Button
-          theme='outline'
-          type='primary'
-          icon={<IconCopy />}
-          onClick={handleCopyClick}
-          disabled={selectedRowKeys.length === 0}
-          className='!bg-blue-500 hover:!bg-blue-600 !text-white disabled:!bg-gray-300 disabled:!text-gray-500'
+        <div className='mp-toggle-group'>
+          <span>{t('倍率')}</span>
+          <MarketplaceToggle
+            checked={showRatio}
+            onChange={setShowRatio}
+            label={t('倍率')}
+          />
+        </div>
+
+        <button
+          type='button'
+          className={`mp-view-btn${viewMode === 'card' ? ' active' : ''}`}
+          onClick={() => setViewMode?.('card')}
+          aria-pressed={viewMode === 'card'}
+          aria-label={t('卡片')}
         >
-          {t('复制')}
-        </Button>
+          <LayoutGrid size={14} />
+          {t('卡片')}
+        </button>
+        <button
+          type='button'
+          className={`mp-view-btn${viewMode === 'table' ? ' active' : ''}`}
+          onClick={() => setViewMode?.('table')}
+          aria-pressed={viewMode === 'table'}
+          aria-label={t('表格')}
+        >
+          <Table2 size={14} />
+          {t('表格')}
+        </button>
+      </>
+    );
 
-        {!isMobile && (
-          <>
-            <Divider layout='vertical' margin='8px' />
-
-            {/* 充值价格显示开关 */}
-            <div className='flex items-center gap-2'>
-              <span className='text-sm text-gray-600'>{t('充值价格显示')}</span>
-              <Switch
-                checked={showWithRecharge}
-                onChange={setShowWithRecharge}
-              />
-            </div>
-
-            {/* 货币单位选择 */}
-            {showWithRecharge && (
-              <Select
-                value={currency}
-                onChange={setCurrency}
-                optionList={[
-                  { value: 'USD', label: 'USD' },
-                  { value: 'CNY', label: 'CNY' },
-                  { value: 'CUSTOM', label: t('自定义货币') },
-                ]}
-              />
-            )}
-
-            {/* 显示倍率开关 */}
-            <div className='flex items-center gap-2'>
-              <span className='text-sm text-gray-600'>{t('倍率')}</span>
-              <Switch checked={showRatio} onChange={setShowRatio} />
-            </div>
-
-            {/* 视图模式切换按钮 */}
-            <Button
-              theme={viewMode === 'table' ? 'solid' : 'outline'}
-              type={viewMode === 'table' ? 'primary' : 'tertiary'}
-              onClick={handleViewModeToggle}
+    if (isMobile) {
+      return (
+        <div className='mp-topbar-panel'>
+          <div className='mp-topbar'>
+            {searchInput}
+            <button
+              type='button'
+              className='mp-view-btn'
+              onClick={handleFilterClick}
             >
-              {t('表格视图')}
-            </Button>
+              {t('筛选')}
+            </button>
+          </div>
+        </div>
+      );
+    }
 
-            {/* Token单位切换按钮 */}
-            <Button
-              theme={tokenUnit === 'K' ? 'solid' : 'outline'}
-              type={tokenUnit === 'K' ? 'primary' : 'tertiary'}
-              onClick={handleTokenUnitToggle}
-            >
-              {tokenUnit}
-            </Button>
-          </>
-        )}
-
-        {isMobile && (
-          <Button
-            theme='outline'
-            type='tertiary'
-            icon={<IconFilter />}
-            onClick={handleFilterClick}
-          >
-            {t('筛选')}
-          </Button>
-        )}
+    return (
+      <div className='mp-topbar-panel'>
+        <div className='mp-topbar'>
+          {searchInput}
+          <div className='mp-topbar-right'>{viewControls}</div>
+        </div>
       </div>
     );
   },

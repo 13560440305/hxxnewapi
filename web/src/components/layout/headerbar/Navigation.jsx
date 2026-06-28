@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import SkeletonWrapper from '../components/SkeletonWrapper';
 
 const Navigation = ({
@@ -27,7 +27,22 @@ const Navigation = ({
   isLoading,
   userState,
   pricingRequireAuth,
+  variant = 'default',
 }) => {
+  const location = useLocation();
+  const isMarketplace = variant === 'marketplace';
+
+  const isLinkActive = (link, targetPath) => {
+    if (link.isExternal) return false;
+    if (link.itemKey === 'home') return location.pathname === '/';
+    if (link.itemKey === 'console') {
+      return location.pathname.startsWith('/console');
+    }
+    if (link.itemKey === 'pricing') return location.pathname === '/pricing';
+    if (link.itemKey === 'about') return location.pathname === '/about';
+    return location.pathname === targetPath;
+  };
+
   const renderNavLinks = () => {
     const baseClasses =
       'flex-shrink-0 flex items-center gap-1 font-semibold rounded-md transition-all duration-200 ease-in-out';
@@ -46,7 +61,9 @@ const Navigation = ({
             href={link.externalLink}
             target='_blank'
             rel='noopener noreferrer'
-            className={commonLinkClasses}
+            className={
+              isMarketplace ? 'headerbar-nav-link' : commonLinkClasses
+            }
           >
             {linkContent}
           </a>
@@ -61,8 +78,15 @@ const Navigation = ({
         targetPath = '/login';
       }
 
+      const active = isLinkActive(link, targetPath);
+      const marketplaceClassName = `headerbar-nav-link${active ? ' active' : ''}`;
+
       return (
-        <Link key={link.itemKey} to={targetPath} className={commonLinkClasses}>
+        <Link
+          key={link.itemKey}
+          to={targetPath}
+          className={isMarketplace ? marketplaceClassName : commonLinkClasses}
+        >
           {linkContent}
         </Link>
       );
@@ -70,7 +94,13 @@ const Navigation = ({
   };
 
   return (
-    <nav className='flex flex-1 items-center gap-1 lg:gap-2 mx-2 md:mx-4 overflow-x-auto whitespace-nowrap scrollbar-hide'>
+    <nav
+      className={
+        isMarketplace
+          ? 'headerbar-nav-links'
+          : 'flex flex-1 items-center gap-1 lg:gap-2 mx-2 md:mx-4 overflow-x-auto whitespace-nowrap scrollbar-hide'
+      }
+    >
       <SkeletonWrapper
         loading={isLoading}
         type='navigation'

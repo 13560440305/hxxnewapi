@@ -23,6 +23,7 @@ import PricingContent from './content/PricingContent';
 import ModelDetailSideSheet from '../modal/ModelDetailSideSheet';
 import { useModelPricingData } from '../../../../hooks/model-pricing/useModelPricingData';
 import { useIsMobile } from '../../../../hooks/common/useIsMobile';
+import '../model-marketplace.css';
 
 const PricingPage = () => {
   const pricingData = useModelPricingData();
@@ -39,8 +40,8 @@ const PricingPage = () => {
   };
 
   return (
-    <div className='bg-white'>
-      <Layout className='pricing-layout'>
+    <div className='model-marketplace'>
+      <Layout className='pricing-layout pricing-layout--marketplace'>
         <Content className='pricing-scroll-hide pricing-content'>
           <PricingContent
             {...allProps}

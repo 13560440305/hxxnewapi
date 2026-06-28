@@ -38,6 +38,7 @@ const PricingVendors = ({
   loading = false,
   t,
   layout,
+  variant = 'default',
 }) => {
   // 获取系统中所有供应商（基于 allModels，如果未提供则退化为 models）
   const getAllVendors = React.useMemo(() => {
@@ -82,7 +83,7 @@ const PricingVendors = ({
     const result = [
       {
         value: 'all',
-        label: t('全部供应商'),
+        label: variant === 'pill' ? t('全部') : t('全部供应商'),
         tagCount: getVendorCount('all'),
         disabled: models.length === 0,
       },
@@ -124,6 +125,7 @@ const PricingVendors = ({
       loading={loading}
       t={t}
       layout={layout}
+      variant={variant}
     />
   );
 };

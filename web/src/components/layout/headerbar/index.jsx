@@ -26,6 +26,7 @@ import MobileMenuButton from './MobileMenuButton';
 import HeaderLogo from './HeaderLogo';
 import Navigation from './Navigation';
 import ActionButtons from './ActionButtons';
+import './headerbar-marketplace.css';
 
 const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
   const {
@@ -65,7 +66,7 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
   const { mainNavLinks } = useNavigation(t, docsLink, headerNavModules);
 
   return (
-    <header className='text-semi-color-text-0 sticky top-0 z-50 transition-colors duration-300 bg-white/75 dark:bg-zinc-900/75 backdrop-blur-lg'>
+    <header className='headerbar--marketplace text-semi-color-text-0 sticky top-0 z-50 transition-colors duration-300'>
       <NoticeModal
         visible={noticeVisible}
         onClose={handleNoticeClose}
@@ -74,9 +75,9 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
         unreadKeys={getUnreadKeys()}
       />
 
-      <div className='w-full px-2'>
-        <div className='flex items-center justify-between h-16'>
-          <div className='flex items-center'>
+      <div className='w-full'>
+        <div className='headerbar-marketplace-row'>
+          <div className='headerbar-marketplace-left'>
             <MobileMenuButton
               isConsoleRoute={isConsoleRoute}
               isMobile={isMobile}
@@ -85,7 +86,6 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
               onToggle={handleMobileMenuToggle}
               t={t}
             />
-
             <HeaderLogo
               isMobile={isMobile}
               isConsoleRoute={isConsoleRoute}
@@ -96,17 +96,19 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
               isSelfUseMode={isSelfUseMode}
               isDemoSiteMode={isDemoSiteMode}
               t={t}
+              variant='marketplace'
             />
+            {!isMobile && (
+              <Navigation
+                mainNavLinks={mainNavLinks}
+                isMobile={isMobile}
+                isLoading={isLoading}
+                userState={userState}
+                pricingRequireAuth={pricingRequireAuth}
+                variant='marketplace'
+              />
+            )}
           </div>
-
-          <Navigation
-            mainNavLinks={mainNavLinks}
-            isMobile={isMobile}
-            isLoading={isLoading}
-            userState={userState}
-            pricingRequireAuth={pricingRequireAuth}
-          />
-
           <ActionButtons
             isNewYear={isNewYear}
             unreadCount={unreadCount}
@@ -122,6 +124,7 @@ const HeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
             logout={logout}
             navigate={navigate}
             t={t}
+            variant='marketplace'
           />
         </div>
       </div>

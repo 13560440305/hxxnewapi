@@ -32,9 +32,43 @@ const HeaderLogo = ({
   isSelfUseMode,
   isDemoSiteMode,
   t,
+  variant = 'default',
 }) => {
-  if (isMobile && isConsoleRoute) {
-    return null;
+  if (variant === 'marketplace') {
+    return (
+      <Link to='/' className='headerbar-marketplace-logo group'>
+        <div className='headerbar-logo-img-wrap'>
+          <SkeletonWrapper loading={isLoading || !logoLoaded} type='image' />
+          {logo ? (
+            <img
+              src={logo}
+              alt='logo'
+              className={`headerbar-logo-img transition-transform duration-200 group-hover:scale-110 ${!isLoading && logoLoaded ? 'opacity-100' : 'opacity-0'}`}
+            />
+          ) : (
+            <span className='headerbar-logo-dot' aria-hidden='true' />
+          )}
+        </div>
+        <SkeletonWrapper
+          loading={isLoading}
+          type='title'
+          width={80}
+          height={18}
+        >
+          <span className='headerbar-logo-text'>{systemName}</span>
+        </SkeletonWrapper>
+        {(isSelfUseMode || isDemoSiteMode) && !isLoading && (
+          <Tag
+            color={isSelfUseMode ? 'purple' : 'blue'}
+            className='text-xs px-1.5 py-0.5 rounded whitespace-nowrap shadow-sm'
+            size='small'
+            shape='circle'
+          >
+            {isSelfUseMode ? t('自用模式') : t('演示站点')}
+          </Tag>
+        )}
+      </Link>
+    );
   }
 
   return (

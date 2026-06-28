@@ -63,6 +63,8 @@ const PageLayout = () => {
 
   const shouldHideFooter = cardProPages.includes(location.pathname);
 
+  const isPricingRoute = location.pathname === '/pricing';
+
   const shouldInnerPadding =
     location.pathname.includes('/console') &&
     !location.pathname.startsWith('/console/chat') &&
@@ -162,7 +164,7 @@ const PageLayout = () => {
             style={{
               position: 'fixed',
               left: 0,
-              top: '64px',
+              top: 'var(--app-header-height)',
               zIndex: 99,
               border: 'none',
               paddingRight: '0',
@@ -189,6 +191,7 @@ const PageLayout = () => {
           }}
         >
           <Content
+            className={isPricingRoute ? 'pricing-page-content' : undefined}
             style={{
               flex: '1 0 auto',
               overflowY: isMobile ? 'visible' : 'hidden',

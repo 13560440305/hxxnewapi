@@ -60,6 +60,8 @@ const SelectableButtonGroup = ({
   loading = false,
   /** 'row' = 标签加粗在左，值在右，单行布局（用于模型广场顶部筛选卡片） */
   layout = 'default',
+  /** 'pill' = 模型广场 marketplace 圆角 pill 样式（需配合 layout='row'） */
+  variant = 'default',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [skeletonCount] = useState(12);
@@ -211,6 +213,32 @@ const SelectableButtonGroup = ({
       <Skeleton loading={true} active placeholder={placeholder}></Skeleton>
     );
   };
+
+  const renderRowPills = () =>
+    items.map((item) => {
+      const isDisabled =
+        item.disabled ||
+        (typeof item.tagCount === 'number' && item.tagCount === 0);
+      const isActive = Array.isArray(activeValue)
+        ? activeValue.includes(item.value)
+        : activeValue === item.value;
+
+      return (
+        <button
+          key={item.value}
+          type='button'
+          className={`mp-pill${isActive ? ' active' : ''}`}
+          disabled={isDisabled}
+          onClick={() => !isDisabled && onChange(item.value)}
+        >
+          {item.icon && <span className='mp-pill-icon'>{item.icon}</span>}
+          <span>{item.label}</span>
+          {item.tagCount !== undefined && (
+            <span className='mp-pill-count'>{item.tagCount}</span>
+          )}
+        </button>
+      );
+    });
 
   const renderRowButtons = () => (
     <div className='flex flex-wrap gap-2' style={{ lineHeight: '32px', ...style }}>
@@ -371,16 +399,32 @@ const SelectableButtonGroup = ({
   );
 
   const isRowLayout = layout === 'row';
+  const usePillVariant = isRowLayout && variant === 'pill';
 
   if (isRowLayout) {
-    const needCollapseRow = collapsible && items.length > 24;
+    const needCollapseRow = collapsible && items.length > 24 && !usePillVariant;
+    const rowContent = showSkeleton
+      ? usePillVariant
+        ? renderRowSkeletonButtons()
+        : renderRowSkeletonButtons()
+      : usePillVariant
+        ? renderRowPills()
+        : renderRowButtons();
+
     return (
       <div
-        className='flex flex-wrap items-center gap-x-3 gap-y-2 mb-4 last:mb-0'
+        className={`mp-filter-row${usePillVariant ? '' : ' flex flex-wrap items-center gap-x-3 gap-y-2 mb-4 last:mb-0'}`}
         ref={containerRef}
+        style={usePillVariant ? undefined : undefined}
       >
         {title && (
-          <span className='font-semibold text-semi-color-text-0 flex-shrink-0'>
+          <span
+            className={
+              usePillVariant
+                ? 'mp-filter-label'
+                : 'font-semibold text-semi-color-text-0 flex-shrink-0'
+            }
+          >
             {showSkeleton ? (
               <Skeleton.Title active style={{ width: 80, height: 14 }} />
             ) : (
@@ -388,15 +432,19 @@ const SelectableButtonGroup = ({
             )}
           </span>
         )}
-        <div className='flex-1 min-w-0 flex flex-wrap gap-2'>
+        <div
+          className={
+            usePillVariant ? 'mp-filter-pills' : 'flex-1 min-w-0 flex flex-wrap gap-2'
+          }
+        >
           {needCollapseRow && !showSkeleton ? (
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative', width: '100%' }}>
               <Collapsible
                 isOpen={isOpen}
                 collapseHeight={collapseHeight}
                 style={{ ...maskStyle }}
               >
-                {contentElementRow}
+                {rowContent}
               </Collapsible>
               {isOpen ? null : (
                 <div onClick={toggle} style={{ ...linkStyle }}>
@@ -405,14 +453,22 @@ const SelectableButtonGroup = ({
                 </div>
               )}
               {isOpen && (
-                <div onClick={toggle} style={{ ...linkStyle, position: 'static', marginTop: 8, bottom: 'auto' }}>
+                <div
+                  onClick={toggle}
+                  style={{
+                    ...linkStyle,
+                    position: 'static',
+                    marginTop: 8,
+                    bottom: 'auto',
+                  }}
+                >
                   <IconChevronUp size='small' />
                   <span>{t('收起')}</span>
                 </div>
               )}
             </div>
           ) : (
-            contentElementRow
+            rowContent
           )}
         </div>
       </div>

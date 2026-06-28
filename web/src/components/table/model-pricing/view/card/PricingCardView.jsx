@@ -5,53 +5,38 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
 */
 
 import React from 'react';
-import {
-  Card,
-  Tag,
-  Tooltip,
-  Checkbox,
-  Empty,
-  Pagination,
-  Button,
-  Avatar,
-} from '@douyinfe/semi-ui';
+import { Empty, Pagination, Tooltip } from '@douyinfe/semi-ui';
 import { IconHelpCircle } from '@douyinfe/semi-icons';
-import { Copy } from 'lucide-react';
 import {
   IllustrationNoResult,
   IllustrationNoResultDark,
 } from '@douyinfe/semi-illustrations';
 import {
-  stringToColor,
+  Copy,
+  Square,
+  SquareCheck,
+  ArrowRight,
+  ArrowLeft,
+  Coins,
+  Gift,
+  Sparkles,
+} from 'lucide-react';
+import {
   calculateModelPrice,
-  formatPriceInfo,
   getLobeHubIcon,
 } from '../../../../../helpers';
+import {
+  getProviderAccentClass,
+  isFreeTokenPrice,
+  getProviderIconStyle,
+} from '../../marketplaceUtils';
 import PricingCardSkeleton from './PricingCardSkeleton';
 import { useMinimumLoadingTime } from '../../../../../hooks/common/useMinimumLoadingTime';
 import { renderLimitedItems } from '../../../../common/ui/RenderUtils';
 import { useIsMobile } from '../../../../../hooks/common/useIsMobile';
-
-const CARD_STYLES = {
-  container:
-    'w-12 h-12 rounded-2xl flex items-center justify-center relative shadow-md',
-  icon: 'w-8 h-8 flex items-center justify-center',
-  selected: 'border-blue-500 bg-blue-50',
-  default: 'border-gray-200 hover:border-gray-300',
-};
 
 const PricingCardView = ({
   filteredModels,
@@ -84,9 +69,11 @@ const PricingCardView = ({
   const getModelKey = (model) => model.key ?? model.model_name ?? model.id;
   const isMobile = useIsMobile();
 
-  const handleCheckboxChange = (model, checked) => {
+  const handleCheckboxChange = (model, e) => {
+    e.stopPropagation();
     if (!setSelectedRowKeys) return;
     const modelKey = getModelKey(model);
+    const checked = !selectedRowKeys.includes(modelKey);
     const newKeys = checked
       ? Array.from(new Set([...selectedRowKeys, modelKey]))
       : selectedRowKeys.filter((key) => key !== modelKey);
@@ -94,127 +81,172 @@ const PricingCardView = ({
     rowSelection?.onChange?.(newKeys, null);
   };
 
-  // 获取模型图标
-  const getModelIcon = (model) => {
-    if (!model || !model.model_name) {
+  const getModelIcon = (model, accentClass) => {
+    const iconStyle = getProviderIconStyle(accentClass);
+
+    if (model?.icon) {
       return (
-        <div className={CARD_STYLES.container}>
-          <Avatar size='large'>?</Avatar>
+        <div className='mp-provider-icon' style={iconStyle}>
+          {getLobeHubIcon(model.icon, 20)}
         </div>
       );
     }
-    // 1) 优先使用模型自定义图标
-    if (model.icon) {
+    if (model?.vendor_icon) {
       return (
-        <div className={CARD_STYLES.container}>
-          <div className={CARD_STYLES.icon}>
-            {getLobeHubIcon(model.icon, 32)}
-          </div>
-        </div>
-      );
-    }
-    // 2) 退化为供应商图标
-    if (model.vendor_icon) {
-      return (
-        <div className={CARD_STYLES.container}>
-          <div className={CARD_STYLES.icon}>
-            {getLobeHubIcon(model.vendor_icon, 32)}
-          </div>
+        <div className='mp-provider-icon' style={iconStyle}>
+          {getLobeHubIcon(model.vendor_icon, 20)}
         </div>
       );
     }
 
-    // 如果没有供应商图标，使用模型名称生成头像
-
-    const avatarText = model.model_name.slice(0, 2).toUpperCase();
+    const avatarText = (model?.model_name || '?').slice(0, 2).toUpperCase();
     return (
-      <div className={CARD_STYLES.container}>
-        <Avatar
-          size='large'
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 16,
-            fontSize: 16,
-            fontWeight: 'bold',
-          }}
-        >
-          {avatarText}
-        </Avatar>
+      <div className='mp-provider-icon text-icon' style={iconStyle}>
+        {avatarText}
       </div>
     );
   };
 
-  // 获取模型描述
-  const getModelDescription = (record) => {
-    return record.description || '';
+  const getModelSubtitle = (model) => {
+    if (model.vendor_name) return model.vendor_name;
+    return t('未知供应商');
   };
 
-  // 渲染标签
-  const renderTags = (record) => {
-    // 计费类型标签（左边）
-    let billingTag = (
-      <Tag key='billing' shape='circle' color='white' size='small'>
-        -
-      </Tag>
-    );
-    if (record.quota_type === 1) {
-      billingTag = (
-        <Tag key='billing' shape='circle' color='teal' size='small'>
-          {t('按次计费')}
-        </Tag>
-      );
-    } else if (record.quota_type === 0) {
-      billingTag = (
-        <Tag key='billing' shape='circle' color='violet' size='small'>
-          {t('按量计费')}
-        </Tag>
+  const renderPriceBlock = (model, priceData) => {
+    if (priceData.isPerToken) {
+      const isFree = isFreeTokenPrice(priceData);
+      const unitLabel = `/ ${priceData.unitLabel} tokens`;
+
+      return (
+        <div className='mp-pricing'>
+          <div className='mp-price-item'>
+            <div className='mp-price-dir'>
+              <ArrowRight size={12} />
+              {t('输入')}
+            </div>
+            <div className={`mp-price-val${isFree ? ' is-free' : ''}`}>
+              {isFree ? (
+                <>
+                  {t('免费')}{' '}
+                  <span className='mp-price-unit'>
+                    {priceData.inputPrice} {unitLabel}
+                  </span>
+                </>
+              ) : (
+                <>
+                  {priceData.inputPrice}{' '}
+                  <span className='mp-price-unit'>{unitLabel}</span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className='mp-price-item'>
+            <div className='mp-price-dir'>
+              <ArrowLeft size={12} />
+              {t('输出')}
+            </div>
+            <div className={`mp-price-val${isFree ? ' is-free' : ''}`}>
+              {isFree ? (
+                <>
+                  {t('免费')}{' '}
+                  <span className='mp-price-unit'>
+                    {priceData.completionPrice} {unitLabel}
+                  </span>
+                </>
+              ) : (
+                <>
+                  {priceData.completionPrice}{' '}
+                  <span className='mp-price-unit'>{unitLabel}</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       );
     }
 
-    // 自定义标签（右边）
-    const customTags = [];
+    return (
+      <div className='mp-pricing'>
+        <div className='mp-price-item' style={{ gridColumn: '1 / -1' }}>
+          <div className='mp-price-dir'>{t('模型价格')}</div>
+          <div className='mp-price-val'>{priceData.price}</div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTags = (record, isFree) => {
+    const tags = [];
+
+    if (record.quota_type === 1) {
+      tags.push(
+        <span key='billing' className='mp-tag mp-tag-billing'>
+          <Coins size={12} />
+          {t('按次计费')}
+        </span>,
+      );
+    } else if (record.quota_type === 0) {
+      tags.push(
+        <span key='billing' className='mp-tag mp-tag-billing'>
+          <Coins size={12} />
+          {t('按量计费')}
+        </span>,
+      );
+    } else {
+      tags.push(
+        <span key='billing' className='mp-tag mp-tag-custom'>-</span>,
+      );
+    }
+
+    if (isFree) {
+      tags.push(
+        <span key='free' className='mp-tag mp-tag-free'>
+          <Gift size={12} />
+          {t('免费')}
+        </span>,
+      );
+    }
+
+    const customTagElements = [];
     if (record.tags) {
       const tagArr = record.tags.split(',').filter(Boolean);
       tagArr.forEach((tg, idx) => {
-        customTags.push(
-          <Tag
+        const trimmed = tg.trim();
+        const isNewTag = /新|new/i.test(trimmed);
+        customTagElements.push(
+          <span
             key={`custom-${idx}`}
-            shape='circle'
-            color={stringToColor(tg)}
-            size='small'
+            className={`mp-tag ${isNewTag ? 'mp-tag-new' : 'mp-tag-custom'}`}
           >
-            {tg}
-          </Tag>,
+            {isNewTag && <Sparkles size={12} />}
+            {trimmed}
+          </span>,
         );
       });
     }
 
     return (
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-2'>{billingTag}</div>
-        <div className='flex items-center gap-1'>
-          {customTags.length > 0 &&
-            renderLimitedItems({
-              items: customTags.map((tag, idx) => ({
+      <div className='mp-card-footer-tags'>
+        <div className='mp-tags'>{tags}</div>
+        {customTagElements.length > 0 && (
+          <div className='mp-tags mp-tags-custom'>
+            {renderLimitedItems({
+              items: customTagElements.map((el, idx) => ({
                 key: `custom-${idx}`,
-                element: tag,
+                element: el,
               })),
-              renderItem: (item, idx) => item.element,
+              renderItem: (item) => item.element,
               maxDisplay: 3,
             })}
-        </div>
+          </div>
+        )}
       </div>
     );
   };
 
-  // 显示骨架屏
   if (showSkeleton) {
     return (
-      <PricingCardSkeleton
-        rowSelection={!!rowSelection}
-        showRatio={showRatio}
-      />
+      <PricingCardSkeleton rowSelection={!!rowSelection} showRatio={showRatio} />
     );
   }
 
@@ -233,11 +265,12 @@ const PricingCardView = ({
   }
 
   return (
-    <div className='px-2 pt-2'>
-      <div className='grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4'>
+    <div>
+      <div className='mp-grid'>
         {paginatedModels.map((model, index) => {
           const modelKey = getModelKey(model);
           const isSelected = selectedRowKeys.includes(modelKey);
+          const accentClass = getProviderAccentClass(model);
 
           const priceData = calculateModelPrice({
             record: model,
@@ -248,123 +281,126 @@ const PricingCardView = ({
             currency,
           });
 
+          const isFree = isFreeTokenPrice(priceData);
+          const description = model.description || '';
+          const shortId =
+            model.model_name?.includes('/')
+              ? model.model_name.split('/').pop()
+              : model.model_name;
+
           return (
-            <Card
+            <div
               key={modelKey || index}
-              className={`!rounded-2xl transition-all duration-200 hover:shadow-lg border cursor-pointer ${isSelected ? CARD_STYLES.selected : CARD_STYLES.default}`}
-              bodyStyle={{ height: '100%' }}
+              className={`mp-model-card ${accentClass}${isSelected ? ' selected' : ''}`}
               onClick={() => openModelDetail && openModelDetail(model)}
+              role='button'
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  openModelDetail?.(model);
+                }
+              }}
             >
-              <div className='flex flex-col h-full'>
-                {/* 头部：图标 + 模型名称 + 操作按钮 */}
-                <div className='flex items-start justify-between mb-3'>
-                  <div className='flex items-start space-x-3 flex-1 min-w-0'>
-                    {getModelIcon(model)}
-                    <div className='flex-1 min-w-0'>
-                      <h3 className='text-lg font-bold text-gray-900 truncate'>
-                        {model.model_name}
-                      </h3>
-                      <div className='flex items-center gap-3 text-xs mt-1'>
-                        {formatPriceInfo(priceData, t)}
-                      </div>
-                    </div>
+              <div className='mp-card-header'>
+                {getModelIcon(model, accentClass)}
+                <div className='mp-card-meta'>
+                  <div className='mp-model-name' title={model.model_name}>
+                    {model.model_name}
                   </div>
-
-                  <div className='flex items-center space-x-2 ml-3'>
-                    {/* 复制按钮 */}
-                    <Button
-                      size='small'
-                      theme='outline'
-                      type='tertiary'
-                      icon={<Copy size={12} />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyText(model.model_name);
-                      }}
-                    />
-
-                    {/* 选择框 */}
-                    {rowSelection && (
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          handleCheckboxChange(model, e.target.checked);
-                        }}
-                      />
-                    )}
-                  </div>
+                  <div className='mp-model-provider'>{getModelSubtitle(model)}</div>
                 </div>
-
-                {/* 模型描述 - 占据剩余空间 */}
-                <div className='flex-1 mb-4'>
-                  <p
-                    className='text-xs line-clamp-2 leading-relaxed'
-                    style={{ color: 'var(--semi-color-text-2)' }}
+                <div className='mp-card-actions'>
+                  <button
+                    type='button'
+                    className='mp-icon-btn'
+                    title={t('复制')}
+                    aria-label={t('复制')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copyText(model.model_name);
+                    }}
                   >
-                    {getModelDescription(model)}
-                  </p>
-                </div>
-
-                {/* 底部区域 */}
-                <div className='mt-auto'>
-                  {/* 标签区域 */}
-                  {renderTags(model)}
-
-                  {/* 倍率信息（可选） */}
-                  {showRatio && (
-                    <div className='pt-3'>
-                      <div className='flex items-center space-x-1 mb-2'>
-                        <span className='text-xs font-medium text-gray-700'>
-                          {t('倍率信息')}
-                        </span>
-                        <Tooltip
-                          content={t('倍率是为了方便换算不同价格的模型')}
-                        >
-                          <IconHelpCircle
-                            className='text-blue-500 cursor-pointer'
-                            size='small'
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setModalImageUrl('/ratio.png');
-                              setIsModalOpenurl(true);
-                            }}
-                          />
-                        </Tooltip>
-                      </div>
-                      <div className='grid grid-cols-3 gap-2 text-xs text-gray-600'>
-                        <div>
-                          {t('模型')}:{' '}
-                          {model.quota_type === 0 ? model.model_ratio : t('无')}
-                        </div>
-                        <div>
-                          {t('补全')}:{' '}
-                          {model.quota_type === 0
-                            ? parseFloat(model.completion_ratio.toFixed(3))
-                            : t('无')}
-                        </div>
-                        <div>
-                          {t('分组')}: {priceData?.usedGroupRatio ?? '-'}
-                        </div>
-                      </div>
-                    </div>
+                    <Copy size={14} />
+                  </button>
+                  {rowSelection && (
+                    <button
+                      type='button'
+                      className={`mp-icon-btn${isSelected ? ' selected' : ''}`}
+                      title={isSelected ? t('取消选择') : t('选择')}
+                      aria-label={isSelected ? t('取消选择') : t('选择')}
+                      onClick={(e) => handleCheckboxChange(model, e)}
+                    >
+                      {isSelected ? (
+                        <SquareCheck size={14} />
+                      ) : (
+                        <Square size={14} />
+                      )}
+                    </button>
                   )}
                 </div>
               </div>
-            </Card>
+
+              {renderPriceBlock(model, priceData)}
+
+              {description && (
+                <p className='mp-model-desc' title={description}>
+                  {description}
+                </p>
+              )}
+
+              <div className='mp-card-footer'>
+                {renderTags(model, isFree)}
+                <span className='mp-model-id' title={model.model_name}>
+                  {shortId}
+                </span>
+              </div>
+
+              {showRatio && (
+                <div className='mp-ratio-block'>
+                  <div className='flex items-center gap-1 mb-1'>
+                    <span className='mp-ratio-title'>{t('倍率信息')}</span>
+                    <Tooltip content={t('倍率是为了方便换算不同价格的模型')}>
+                      <IconHelpCircle
+                        className='mp-ratio-help'
+                        size='small'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModalImageUrl?.('/ratio.png');
+                          setIsModalOpenurl?.(true);
+                        }}
+                      />
+                    </Tooltip>
+                  </div>
+                  <div className='mp-ratio-grid'>
+                    <div>
+                      {t('模型')}:{' '}
+                      {model.quota_type === 0 ? model.model_ratio : t('无')}
+                    </div>
+                    <div>
+                      {t('补全')}:{' '}
+                      {model.quota_type === 0
+                        ? parseFloat(model.completion_ratio.toFixed(3))
+                        : t('无')}
+                    </div>
+                    <div>
+                      {t('分组')}: {priceData?.usedGroupRatio ?? '-'}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
 
-      {/* 分页 */}
       {filteredModels.length > 0 && (
-        <div className='flex justify-center mt-6 py-4 border-t pricing-pagination-divider'>
+        <div className='mp-pagination'>
           <Pagination
             currentPage={currentPage}
             pageSize={pageSize}
             total={filteredModels.length}
-            showSizeChanger={true}
-            pageSizeOptions={[10, 20, 50, 100]}
+            showSizeChanger
+            pageSizeOpts={[10, 20, 50, 100]}
             size={isMobile ? 'small' : 'default'}
             showQuickJumper={isMobile}
             onPageChange={(page) => setCurrentPage(page)}

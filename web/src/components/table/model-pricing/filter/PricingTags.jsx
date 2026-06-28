@@ -37,6 +37,7 @@ const PricingTags = ({
   loading = false,
   t,
   layout,
+  variant = 'default',
 }) => {
   // 提取系统所有标签
   const getAllTags = React.useMemo(() => {
@@ -105,6 +106,7 @@ const PricingTags = ({
       loading={loading}
       t={t}
       layout={layout}
+      variant={variant}
     />
   );
 };

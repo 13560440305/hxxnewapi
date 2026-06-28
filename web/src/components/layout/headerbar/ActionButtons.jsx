@@ -39,23 +39,39 @@ const ActionButtons = ({
   logout,
   navigate,
   t,
+  variant = 'default',
 }) => {
+  const isMarketplace = variant === 'marketplace';
+
   return (
-    <div className='flex items-center gap-2 md:gap-3'>
+    <div
+      className={
+        isMarketplace
+          ? 'headerbar-marketplace-actions'
+          : 'flex items-center gap-2 md:gap-3'
+      }
+    >
       <NewYearButton isNewYear={isNewYear} />
 
       <NotificationButton
         unreadCount={unreadCount}
         onNoticeOpen={onNoticeOpen}
         t={t}
+        variant={variant}
       />
 
-      <ThemeToggle theme={theme} onThemeToggle={onThemeToggle} t={t} />
+      <ThemeToggle
+        theme={theme}
+        onThemeToggle={onThemeToggle}
+        t={t}
+        variant={variant}
+      />
 
       <LanguageSelector
         currentLang={currentLang}
         onLanguageChange={onLanguageChange}
         t={t}
+        variant={variant}
       />
 
       <UserArea
@@ -66,6 +82,7 @@ const ActionButtons = ({
         logout={logout}
         navigate={navigate}
         t={t}
+        variant={variant}
       />
     </div>
   );
