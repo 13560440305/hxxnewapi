@@ -92,26 +92,6 @@ func SetDocsRouter(router *gin.Engine, docsEmbed embed.FS) {
 		reqPath := strings.TrimPrefix(c.Request.URL.Path, "/docs")
 		reqPath = strings.TrimPrefix(reqPath, "/")
 
-		if reqPath == "cn" || strings.HasPrefix(reqPath, "cn/") {
-			suffix := strings.TrimPrefix(reqPath, "cn")
-			target := "/docs/"
-			if suffix != "" && suffix != "/" {
-				if !strings.HasPrefix(suffix, "/") {
-					suffix = "/" + suffix
-				}
-				target = "/docs" + suffix
-			}
-			if q := c.Request.URL.RawQuery; q != "" {
-				target += "?" + q
-			}
-			c.Redirect(http.StatusMovedPermanently, target)
-			return
-		}
-		if reqPath == "en" || strings.HasPrefix(reqPath, "en/") {
-			c.Redirect(http.StatusMovedPermanently, "/docs/")
-			return
-		}
-
 		filePath, ok := resolveDocsFile(httpFS, reqPath)
 		if !ok {
 			c.Status(http.StatusNotFound)

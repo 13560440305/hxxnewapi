@@ -69,7 +69,7 @@ docker-compose down
 
 ## 二、本地开发与启动
 
-> 详细步骤见 [docs/本地开发与启动.md](./docs/本地开发与启动.md)
+> 详细步骤见 [docs/cn/本地开发与启动.md](./docs/cn/本地开发与启动.md)
 
 ### 前置条件
 

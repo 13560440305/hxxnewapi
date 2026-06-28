@@ -29,6 +29,17 @@
   color: #c2410c;
 }
 
+.docs-top-bar .docs-lang-link {
+  margin-left: auto;
+  color: #6b7280;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.docs-top-bar .docs-lang-link:hover {
+  color: #374151;
+}
+
 /* 为顶栏腾出空间 */
 body.docs-with-chrome .sidebar {
   top: 48px !important;
