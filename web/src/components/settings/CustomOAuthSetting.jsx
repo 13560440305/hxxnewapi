@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Form,
@@ -279,7 +279,7 @@ const CustomOAuthSetting = ({ serverAddress }) => {
     setModalVisible(true);
   };
 
-  const handleEdit = (provider) => {
+  const handleEdit = useCallback((provider) => {
     setEditingProvider(provider);
     setFormValues({ ...provider });
     setSelectedPreset(OAUTH_PRESETS[provider.slug] ? provider.slug : '');
@@ -287,9 +287,9 @@ const CustomOAuthSetting = ({ serverAddress }) => {
     resetDiscoveryState();
     setAdvancedActiveKeys([]);
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     try {
       const res = await API.delete(`/api/custom-oauth-provider/${id}`);
       if (res.data.success) {
@@ -301,7 +301,7 @@ const CustomOAuthSetting = ({ serverAddress }) => {
     } catch (error) {
       showError(t('删除失败'));
     }
-  };
+  }, [t]);
 
   const handleSubmit = async () => {
     const currentValues = getLatestFormValues();
@@ -528,68 +528,71 @@ const CustomOAuthSetting = ({ serverAddress }) => {
     showSuccess(t('已填充提示模板'));
   };
 
-  const columns = [
-    {
-      title: t('图标'),
-      dataIndex: 'icon',
-      key: 'icon',
-      width: 80,
-      render: (icon) => getOAuthProviderIcon(icon || '', 18),
-    },
-    {
-      title: t('名称'),
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Slug',
-      dataIndex: 'slug',
-      key: 'slug',
-      render: (slug) => <Tag>{slug}</Tag>,
-    },
-    {
-      title: t('状态'),
-      dataIndex: 'enabled',
-      key: 'enabled',
-      render: (enabled) => (
-        <Tag color={enabled ? 'green' : 'grey'}>
-          {enabled ? t('已启用') : t('已禁用')}
-        </Tag>
-      ),
-    },
-    {
-      title: t('Client ID'),
-      dataIndex: 'client_id',
-      key: 'client_id',
-      render: (id) => {
-        if (!id) return '-';
-        return id.length > 20 ? `${id.substring(0, 20)}...` : id;
+  const columns = useMemo(
+    () => [
+      {
+        title: t('图标'),
+        dataIndex: 'icon',
+        key: 'icon',
+        width: 80,
+        render: (icon) => getOAuthProviderIcon(icon || '', 18),
       },
-    },
-    {
-      title: t('操作'),
-      key: 'actions',
-      render: (_, record) => (
-        <Space>
-          <Button
-            icon={<IconEdit />}
-            size="small"
-            onClick={() => handleEdit(record)}
-          >
-            {t('编辑')}
-          </Button>
-          <Popconfirm
-            title={t('确定要删除此 OAuth 提供商吗？')}
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button icon={<IconDelete />} size="small" type="danger">
-              {t('删除')}
+      {
+        title: t('名称'),
+        dataIndex: 'name',
+        key: 'name',
+      },
+      {
+        title: 'Slug',
+        dataIndex: 'slug',
+        key: 'slug',
+        render: (slug) => <Tag>{slug}</Tag>,
+      },
+      {
+        title: t('状态'),
+        dataIndex: 'enabled',
+        key: 'enabled',
+        render: (enabled) => (
+          <Tag color={enabled ? 'green' : 'grey'}>
+            {enabled ? t('已启用') : t('已禁用')}
+          </Tag>
+        ),
+      },
+      {
+        title: t('Client ID'),
+        dataIndex: 'client_id',
+        key: 'client_id',
+        render: (id) => {
+          if (!id) return '-';
+          return id.length > 20 ? `${id.substring(0, 20)}...` : id;
+        },
+      },
+      {
+        title: t('操作'),
+        key: 'actions',
+        render: (_, record) => (
+          <Space>
+            <Button
+              icon={<IconEdit />}
+              size='small'
+              onClick={() => handleEdit(record)}
+            >
+              {t('编辑')}
             </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+            <Popconfirm
+              title={t('确定要删除此 OAuth 提供商吗？')}
+              onConfirm={() => handleDelete(record.id)}
+            >
+              <Button icon={<IconDelete />} size='small' type='danger'>
+                {t('删除')}
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ],
+    [t, handleEdit, handleDelete],
+  );
 
   const discoveryAutoFilledLabels = (discoveryInfo?.autoFilledFields || [])
     .map((field) => DISCOVERY_FIELD_LABELS[field] || field)
@@ -597,7 +600,10 @@ const CustomOAuthSetting = ({ serverAddress }) => {
 
   return (
     <Card>
-      <Form.Section text={t('自定义 OAuth 提供商')}>
+      <div className='semi-form-section'>
+        <Text strong style={{ display: 'block', marginBottom: 16, fontSize: 16 }}>
+          {t('自定义 OAuth 提供商')}
+        </Text>
         <Banner
           type="info"
           description={
@@ -626,7 +632,7 @@ const CustomOAuthSetting = ({ serverAddress }) => {
           columns={columns}
           dataSource={providers}
           loading={loading}
-          rowKey="id"
+          rowKey={(record) => String(record.id ?? record.slug)}
           pagination={false}
           empty={t('暂无自定义 OAuth 提供商')}
         />
@@ -1045,9 +1051,9 @@ const CustomOAuthSetting = ({ serverAddress }) => {
             </Collapse>
           </Form>
         </Modal>
-      </Form.Section>
+      </div>
     </Card>
   );
 };
 
-export default CustomOAuthSetting;
+export default React.memo(CustomOAuthSetting);

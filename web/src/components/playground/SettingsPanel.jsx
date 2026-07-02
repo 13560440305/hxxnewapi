@@ -58,13 +58,15 @@ const SettingsPanel = ({
 
   return (
     <Card
-      className='h-full flex flex-col'
+      className='playground-settings-panel flex h-full min-h-0 flex-col'
       bordered={false}
       bodyStyle={{
         padding: styleState.isMobile ? '16px' : '24px',
         height: '100%',
+        minHeight: 0,
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
       }}
     >
       {/* 标题区域 - 与调试面板保持一致 */}
@@ -103,7 +105,7 @@ const SettingsPanel = ({
         </div>
       )}
 
-      <div className='space-y-6 overflow-y-auto flex-1 pr-2 model-settings-scroll'>
+      <div className='playground-settings-scroll min-h-0 flex-1 space-y-6 overflow-y-auto pr-2'>
         {/* 自定义请求体编辑器 */}
         <CustomRequestEditor
           customRequestMode={customRequestMode}

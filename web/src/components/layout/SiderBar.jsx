@@ -48,6 +48,7 @@ const routerMap = {
   models: '/console/models',
   deployment: '/console/deployment',
   playground: '/console/playground',
+  chatHistory: '/console/chat-history',
   personal: '/console/personal',
 };
 
@@ -203,24 +204,27 @@ const SiderBar = ({ onNavigate = () => {} }) => {
   const chatMenuItems = useMemo(() => {
     const items = [
       {
-        text: t('操练场'),
+        text: t('新聊天'),
         itemKey: 'playground',
         to: '/playground',
       },
       {
-        text: t('聊天'),
-        itemKey: 'chat',
-        items: chatItems,
+        text: t('搜索聊天'),
+        itemKey: 'chatHistory',
+        to: '/chat-history',
       },
     ];
 
-    // 根据配置过滤项目
-    const filteredItems = items.filter((item) => {
-      const configVisible = isModuleVisible('chat', item.itemKey);
-      return configVisible;
-    });
+    // 外部聊天子应用仅管理员可见
+    if (isAdmin()) {
+      items.push({
+        text: t('聊天'),
+        itemKey: 'chat',
+        items: chatItems,
+      });
+    }
 
-    return filteredItems;
+    return items.filter((item) => isModuleVisible('chat', item.itemKey));
   }, [chatItems, t, isModuleVisible]);
 
   // 更新路由映射，添加聊天路由
@@ -237,8 +241,10 @@ const SiderBar = ({ onNavigate = () => {} }) => {
     return newRouterMap;
   };
 
-  // 加载聊天项
+  // 加载聊天项（仅管理员侧栏需要）
   useEffect(() => {
+    if (!isAdmin()) return;
+
     let chats = localStorage.getItem('chats');
     if (chats) {
       try {
@@ -440,8 +446,8 @@ const SiderBar = ({ onNavigate = () => {} }) => {
             setOpenedKeys(data.openKeys);
           }}
         >
-          {/* 聊天区域 */}
-          {hasSectionVisibleModules('chat') && (
+          {/* 聊天区域：普通用户仅操练场，管理员含聊天子应用 */}
+          {chatMenuItems.length > 0 && (
             <div className='sidebar-section'>
               {!collapsed && (
                 <div className='sidebar-group-label'>{t('聊天')}</div>
@@ -453,7 +459,9 @@ const SiderBar = ({ onNavigate = () => {} }) => {
           {/* 控制台区域 */}
           {hasSectionVisibleModules('console') && (
             <>
-              <Divider className='sidebar-divider' />
+              {chatMenuItems.length > 0 && (
+                <Divider className='sidebar-divider' />
+              )}
               <div>
                 {!collapsed && (
                   <div className='sidebar-group-label'>{t('控制台')}</div>
@@ -516,7 +524,7 @@ const SiderBar = ({ onNavigate = () => {} }) => {
               />
             }
             onClick={toggleCollapsed}
-            icononly={collapsed}
+            iconOnly={collapsed}
             style={
               collapsed
                 ? { width: 36, height: 24, padding: 0 }

@@ -21,6 +21,7 @@ import {
   STORAGE_KEYS,
   DEFAULT_CONFIG,
 } from '../../constants/playground.constants';
+import { hasPersistableMessages } from './conversationStorage';
 
 const MESSAGES_STORAGE_KEY = 'playground_messages';
 
@@ -46,6 +47,10 @@ export const saveConfig = (config) => {
  */
 export const saveMessages = (messages) => {
   try {
+    if (!hasPersistableMessages(messages)) {
+      clearMessages();
+      return;
+    }
     const messagesToSave = {
       messages,
       timestamp: new Date().toISOString(),

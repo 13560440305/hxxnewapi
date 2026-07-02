@@ -29,7 +29,6 @@ import {
   Cog,
   MoreHorizontal,
   LayoutDashboard,
-  MessageSquare,
   Palette,
   CreditCard,
   Server,
@@ -44,7 +43,6 @@ import RateLimitSetting from '../../components/settings/RateLimitSetting';
 import ModelSetting from '../../components/settings/ModelSetting';
 import DashboardSetting from '../../components/settings/DashboardSetting';
 import RatioSetting from '../../components/settings/RatioSetting';
-import ChatsSetting from '../../components/settings/ChatsSetting';
 import DrawingSetting from '../../components/settings/DrawingSetting';
 import PaymentSetting from '../../components/settings/PaymentSetting';
 import ModelDeploymentSetting from '../../components/settings/ModelDeploymentSetting';
@@ -54,7 +52,7 @@ const Setting = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [tabActiveKey, setTabActiveKey] = useState('1');
+  const [tabActiveKey, setTabActiveKey] = useState('operation');
   let panes = [];
 
   if (isRoot()) {
@@ -77,16 +75,6 @@ const Setting = () => {
       ),
       content: <DashboardSetting />,
       itemKey: 'dashboard',
-    });
-    panes.push({
-      tab: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <MessageSquare size={18} />
-          {t('聊天设置')}
-        </span>
-      ),
-      content: <ChatsSetting />,
-      itemKey: 'chats',
     });
     panes.push({
       tab: (
@@ -184,21 +172,34 @@ const Setting = () => {
     navigate(`?tab=${key}`);
   };
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
+    if (panes.length === 0) return;
+
+    const searchParams = new URLSearchParams(location.search);
     const tab = searchParams.get('tab');
-    if (tab) {
-      setTabActiveKey(tab);
-    } else {
-      onChangeTab('operation');
+    const validTab =
+      tab && panes.some((pane) => pane.itemKey === tab)
+        ? tab
+        : panes[0].itemKey;
+
+    setTabActiveKey((prev) => (prev === validTab ? prev : validTab));
+
+    if (tab !== validTab) {
+      navigate(`?tab=${validTab}`, { replace: true });
     }
-  }, [location.search]);
+  }, [location.search, navigate, panes.length]);
   return (
-    <div className='mt-[60px] px-2'>
-      <Layout>
-        <Layout.Content>
+    <div className='console-setting-page mt-[60px] px-2 pb-3'>
+      <Layout className='h-full min-h-0'>
+        <Layout.Content className='h-full min-h-0'>
+          {panes.length === 0 ? (
+            <div className='py-16 text-center text-semi-color-text-2'>
+              {t('您无权访问此页面，请联系管理员')}
+            </div>
+          ) : (
           <Tabs
             type='card'
             collapsible
+            className='console-setting-tabs h-full min-h-0'
             activeKey={tabActiveKey}
             onChange={(key) => onChangeTab(key)}
           >
@@ -208,6 +209,7 @@ const Setting = () => {
               </TabPane>
             ))}
           </Tabs>
+          )}
         </Layout.Content>
       </Layout>
     </div>

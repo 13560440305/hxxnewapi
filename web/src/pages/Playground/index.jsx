@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 
 import React, { useContext, useEffect, useCallback, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Layout, Toast, Modal } from '@douyinfe/semi-ui';
 
@@ -60,6 +60,16 @@ import {
 import ChatArea from '../../components/playground/ChatArea';
 import FloatingButtons from '../../components/playground/FloatingButtons';
 import { PlaygroundProvider } from '../../contexts/PlaygroundContext';
+import {
+  clearMessages,
+  saveMessages,
+} from '../../components/playground/configStorage';
+import {
+  getConversation,
+  hasPersistableMessages,
+  migrateLegacyPlaygroundMessages,
+  upsertConversation,
+} from '../../components/playground/conversationStorage';
 
 // 生成头像
 const generateAvatarDataUrl = (username) => {
@@ -82,7 +92,15 @@ const Playground = () => {
   const [userState] = useContext(UserContext);
   const isMobile = useIsMobile();
   const styleState = { isMobile };
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const conversationId = searchParams.get('c');
+  const conversationIdRef = useRef(conversationId);
+  const skipConversationLoadRef = useRef(false);
+
+  useEffect(() => {
+    conversationIdRef.current = conversationId;
+  }, [conversationId]);
 
   const state = usePlaygroundState();
   const {
@@ -104,7 +122,6 @@ const Playground = () => {
     handleInputChange,
     handleParameterToggle,
     debouncedSaveConfig,
-    saveMessagesImmediately,
     handleConfigImport,
     handleConfigReset,
     setShowSettings,
@@ -121,13 +138,54 @@ const Playground = () => {
   } = state;
 
   // API 请求相关
+  const persistChatMessages = useCallback(
+    (messagesToSave) => {
+      if (!hasPersistableMessages(messagesToSave)) {
+        clearMessages();
+        return;
+      }
+      saveMessages(messagesToSave);
+      const id = upsertConversation({
+        id: conversationIdRef.current || undefined,
+        messages: messagesToSave,
+        title: undefined,
+      });
+      if (id && !conversationIdRef.current) {
+        conversationIdRef.current = id;
+        skipConversationLoadRef.current = true;
+        setSearchParams({ c: id }, { replace: true });
+      }
+    },
+    [setSearchParams],
+  );
+
   const { sendRequest, onStopGenerator } = useApiRequest(
     setMessage,
     setDebugData,
     setActiveDebugTab,
     sseSourceRef,
-    saveMessagesImmediately,
+    persistChatMessages,
+    persistChatMessages,
   );
+
+  // 迁移旧版单会话数据；按 URL 加载历史会话
+  useEffect(() => {
+    migrateLegacyPlaygroundMessages(t('新聊天'));
+  }, [t]);
+
+  useEffect(() => {
+    if (skipConversationLoadRef.current) {
+      skipConversationLoadRef.current = false;
+      return;
+    }
+    if (conversationId) {
+      const conv = getConversation(conversationId);
+      setMessage(conv?.messages || []);
+      return;
+    }
+    setMessage([]);
+    clearMessages();
+  }, [conversationId, setMessage]);
 
   // 数据加载
   useDataLoader(userState, inputs, handleInputChange, setModels, setGroups);
@@ -145,7 +203,7 @@ const Playground = () => {
     inputs,
     parameterEnabled,
     sendRequest,
-    saveMessagesImmediately,
+    persistChatMessages,
   );
 
   // 消息和自定义请求体同步
@@ -181,7 +239,7 @@ const Playground = () => {
     message,
     setMessage,
     onMessageSend,
-    saveMessagesImmediately,
+    persistChatMessages,
   );
 
   // 构建预览请求体
@@ -255,7 +313,7 @@ const Playground = () => {
           sendRequest(customPayload, customPayload.stream !== false);
 
           // 发送消息后保存，传入新消息列表
-          setTimeout(() => saveMessagesImmediately(newMessages), 0);
+          setTimeout(() => persistChatMessages(newMessages), 0);
 
           return newMessages;
         });
@@ -299,7 +357,7 @@ const Playground = () => {
 
       // 发送消息后保存，传入新消息列表（包含用户消息和加载消息）
       const messagesWithLoading = [...newMessages, loadingMessage];
-      setTimeout(() => saveMessagesImmediately(messagesWithLoading), 0);
+      setTimeout(() => persistChatMessages(messagesWithLoading), 0);
 
       return messagesWithLoading;
     });
@@ -433,9 +491,10 @@ const Playground = () => {
   // 清空对话的处理函数
   const handleClearMessages = useCallback(() => {
     setMessage([]);
-    // 清空对话后保存，传入空数组
-    setTimeout(() => saveMessagesImmediately([]), 0);
-  }, [setMessage, saveMessagesImmediately]);
+    clearMessages();
+    conversationIdRef.current = null;
+    navigate('/console/playground', { replace: true });
+  }, [setMessage, navigate]);
 
   // 处理粘贴图片
   const handlePasteImage = useCallback(
@@ -464,11 +523,11 @@ const Playground = () => {
           {(showSettings || !isMobile) && (
             <Layout.Sider
               className={`
-              bg-transparent border-r-0 flex-shrink-0 overflow-auto mt-[60px]
+              bg-transparent border-r-0 flex-shrink-0 mt-[60px]
               ${
                 isMobile
-                  ? 'fixed top-0 left-0 right-0 bottom-0 z-[1000] w-full h-auto bg-white shadow-lg'
-                  : 'relative z-[1] w-80 h-[calc(100vh-66px)]'
+                  ? 'fixed top-0 left-0 right-0 bottom-0 z-[1000] h-auto w-full overflow-auto bg-white shadow-lg'
+                  : 'relative z-[1] box-border h-[calc(100dvh-var(--app-header-height)-28px)] min-h-0 w-80 overflow-hidden px-3 pb-3 pt-4'
               }
             `}
               width={isMobile ? '100%' : 320}
@@ -496,9 +555,9 @@ const Playground = () => {
             </Layout.Sider>
           )}
 
-          <Layout.Content className='relative flex-1 overflow-hidden'>
-            <div className='overflow-hidden flex flex-col lg:flex-row h-[calc(100vh-66px)] mt-[60px]'>
-              <div className='flex-1 flex flex-col'>
+          <Layout.Content className='relative min-h-0 flex-1 overflow-hidden'>
+            <div className='mt-[60px] flex h-[calc(100dvh-var(--app-header-height)-28px)] min-h-0 flex-col gap-3 px-3 pb-3 pt-4 lg:flex-row'>
+              <div className='flex min-h-0 flex-1 flex-col'>
                 <ChatArea
                   chatRef={chatRef}
                   message={message}

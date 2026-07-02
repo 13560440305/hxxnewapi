@@ -58,8 +58,8 @@ export function getSystemName() {
 
 export function getLogo() {
   let logo = localStorage.getItem('logo');
-  if (!logo) return '/logo.png';
-  return logo;
+  if (!logo || !logo.trim()) return '/logo.png';
+  return logo.trim();
 }
 
 export function getUserIdFromLocalStorage() {

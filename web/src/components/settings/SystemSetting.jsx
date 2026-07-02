@@ -784,7 +784,10 @@ const SystemSetting = () => {
 
               <Card>
                 <Form.Section text={t('SSRF防护设置')}>
-                  <Text extraText={t('SSRF防护详细说明')}>
+                  <Text
+                    type='secondary'
+                    style={{ display: 'block', marginBottom: 16 }}
+                  >
                     {t('配置服务器端请求伪造(SSRF)防护，用于保护内网资源安全')}
                   </Text>
                   <Row
@@ -1535,7 +1538,7 @@ const SystemSetting = () => {
                 </Form.Section>
               </Card>
 
-              <CustomOAuthSetting serverAddress={inputs.ServerAddress} />
+              <CustomOAuthSetting serverAddress={inputs.ServerAddress || ''} />
 
               <Card>
                 <Form.Section text={t('配置 WeChat Server')}>

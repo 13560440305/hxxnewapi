@@ -96,10 +96,20 @@ export const useHeaderBar = ({ onMobileMenuToggle, drawerOpen }) => {
   // Logo loading effect
   useEffect(() => {
     setLogoLoaded(false);
-    if (!logo) return;
+    const src = logo?.trim() ? logo.trim() : '/logo.png';
     const img = new Image();
-    img.src = logo;
     img.onload = () => setLogoLoaded(true);
+    img.onerror = () => {
+      if (src !== '/logo.png') {
+        const fallback = new Image();
+        fallback.onload = () => setLogoLoaded(true);
+        fallback.onerror = () => setLogoLoaded(true);
+        fallback.src = '/logo.png';
+      } else {
+        setLogoLoaded(true);
+      }
+    };
+    img.src = src;
   }, [logo]);
 
   // Send theme to iframe

@@ -43,6 +43,7 @@ export default function SettingsSidebarModulesAdmin(props) {
     chat: {
       enabled: true,
       playground: true,
+      chatHistory: true,
       chat: true,
     },
     console: {
@@ -178,7 +179,7 @@ export default function SettingsSidebarModulesAdmin(props) {
       } catch (error) {
         // 使用默认配置
         const defaultModules = {
-          chat: { enabled: true, playground: true, chat: true },
+          chat: { enabled: true, playground: true, chatHistory: true, chat: true },
           console: {
             enabled: true,
             detail: true,
@@ -209,12 +210,17 @@ export default function SettingsSidebarModulesAdmin(props) {
     {
       key: 'chat',
       title: t('聊天区域'),
-      description: t('操练场和聊天功能'),
+      description: t('新聊天、搜索聊天与外部聊天应用'),
       modules: [
         {
           key: 'playground',
-          title: t('操练场'),
+          title: t('新聊天'),
           description: t('AI模型测试环境'),
+        },
+        {
+          key: 'chatHistory',
+          title: t('搜索聊天'),
+          description: t('搜索并打开历史聊天记录'),
         },
         { key: 'chat', title: t('聊天'), description: t('聊天会话管理') },
       ],

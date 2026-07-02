@@ -22,6 +22,8 @@ import { Link } from 'react-router-dom';
 import { Typography, Tag } from '@douyinfe/semi-ui';
 import SkeletonWrapper from '../components/SkeletonWrapper';
 
+const resolveLogoSrc = (logo) => (logo?.trim() ? logo.trim() : '/logo.png');
+
 const HeaderLogo = ({
   isMobile,
   isConsoleRoute,
@@ -34,20 +36,24 @@ const HeaderLogo = ({
   t,
   variant = 'default',
 }) => {
+  const logoSrc = resolveLogoSrc(logo);
+
   if (variant === 'marketplace') {
     return (
       <Link to='/' className='headerbar-marketplace-logo group'>
         <div className='headerbar-logo-img-wrap'>
           <SkeletonWrapper loading={isLoading || !logoLoaded} type='image' />
-          {logo ? (
-            <img
-              src={logo}
-              alt='logo'
-              className={`headerbar-logo-img transition-transform duration-200 group-hover:scale-110 ${!isLoading && logoLoaded ? 'opacity-100' : 'opacity-0'}`}
-            />
-          ) : (
-            <span className='headerbar-logo-dot' aria-hidden='true' />
-          )}
+          <img
+            src={logoSrc}
+            alt='logo'
+            onError={(e) => {
+              const el = e.currentTarget;
+              if (!el.src.endsWith('/logo.png')) {
+                el.src = '/logo.png';
+              }
+            }}
+            className={`headerbar-logo-img transition-transform duration-200 group-hover:scale-110 ${!isLoading && logoLoaded ? 'opacity-100' : 'opacity-0'}`}
+          />
         </div>
         <SkeletonWrapper
           loading={isLoading}
@@ -76,9 +82,15 @@ const HeaderLogo = ({
       <div className='relative w-8 h-8 md:w-8 md:h-8'>
         <SkeletonWrapper loading={isLoading || !logoLoaded} type='image' />
         <img
-          src={logo}
+          src={logoSrc}
           alt='logo'
-          className={`absolute inset-0 w-full h-full transition-all duration-200 group-hover:scale-110 rounded-full ${!isLoading && logoLoaded ? 'opacity-100' : 'opacity-0'}`}
+          onError={(e) => {
+            const el = e.currentTarget;
+            if (!el.src.endsWith('/logo.png')) {
+              el.src = '/logo.png';
+            }
+          }}
+          className={`absolute inset-0 w-full h-full transition-all duration-200 group-hover:scale-110 rounded-md object-contain ${!isLoading && logoLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
       </div>
       <div className='hidden md:flex items-center gap-2'>

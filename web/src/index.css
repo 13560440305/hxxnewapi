@@ -329,6 +329,46 @@ code {
   overflow-x: hidden !important;
 }
 
+/* 操练场右侧聊天：消息区滚动，输入框固定在底部 */
+.playground-chat.semi-chat {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.playground-chat .semi-chat-inner {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: hidden !important;
+}
+
+.playground-chat .semi-chat-content {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.playground-chat .semi-chat-container {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.playground-chat .semi-chat-inputBox {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+}
+
 .semi-chat-chatBox-action {
   column-gap: 0 !important;
 }
@@ -357,6 +397,90 @@ code {
 .semi-chat-container {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* 操练场右侧聊天：覆盖上面的隐藏规则，内容超出时显示滚动条 */
+.playground-chat .semi-chat-container {
+  -ms-overflow-style: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--semi-color-fill-2) transparent;
+}
+
+.playground-chat .semi-chat-container::-webkit-scrollbar {
+  display: block !important;
+  width: 8px;
+}
+
+.playground-chat .semi-chat-container::-webkit-scrollbar-thumb {
+  background: var(--semi-color-fill-2);
+  border-radius: 4px;
+}
+
+.playground-chat .semi-chat-container::-webkit-scrollbar-thumb:hover {
+  background: var(--semi-color-fill-1);
+}
+
+.playground-chat .semi-chat-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 操练场左侧模型配置：内容超出时显示滚动条 */
+.playground-settings-scroll {
+  overflow-y: auto !important;
+  -ms-overflow-style: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--semi-color-fill-2) transparent;
+}
+
+.playground-settings-scroll::-webkit-scrollbar {
+  display: block !important;
+  width: 8px;
+}
+
+.playground-settings-scroll::-webkit-scrollbar-thumb {
+  background: var(--semi-color-fill-2);
+  border-radius: 4px;
+}
+
+.playground-settings-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--semi-color-fill-1);
+}
+
+.playground-settings-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 操练场面板：模型配置 / 聊天区域边框区分 */
+.playground-settings-panel.semi-card,
+.playground-settings-panel {
+  height: 100%;
+  border: 1px solid var(--semi-color-border) !important;
+  border-radius: 16px !important;
+  background: var(--semi-color-bg-1) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.playground-chat-panel.semi-card,
+.playground-chat-panel {
+  height: 100%;
+  border: 1px solid var(--semi-color-border) !important;
+  border-radius: 16px !important;
+  background: var(--semi-color-bg-0) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+body[theme-mode='dark'] .playground-settings-panel.semi-card,
+body[theme-mode='dark'] .playground-settings-panel,
+body[theme-mode='dark'] .playground-chat-panel.semi-card,
+body[theme-mode='dark'] .playground-chat-panel {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.playground-settings-panel > .semi-card-body,
+.playground-chat-panel > .semi-card-body {
+  border-radius: inherit;
 }
 
 /* ==================== 组件特定样式 ==================== */
@@ -392,20 +516,77 @@ code {
   word-break: break-word;
 }
 
-/* Tabs组件样式 */
-.semi-tabs-content {
+/* Tabs组件样式 — 仅调试面板需要固定高度，避免影响设置页等普通 Tabs */
+.debug-panel .semi-tabs-content {
   padding: 0 !important;
   height: calc(100% - 40px) !important;
   flex: 1 !important;
 }
 
-.semi-tabs-content .semi-tabs-pane {
+.debug-panel .semi-tabs-content .semi-tabs-pane {
   height: 100% !important;
   overflow: hidden !important;
 }
 
-.semi-tabs-content .semi-tabs-pane > div {
+.debug-panel .semi-tabs-content .semi-tabs-pane > div {
   height: 100% !important;
+}
+
+/* 控制台系统设置页 */
+.console-setting-page {
+  height: calc(100dvh - var(--app-header-height) - 12px);
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.console-setting-tabs.semi-tabs {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100%;
+  min-height: 0;
+}
+
+.console-setting-tabs .semi-tabs-bar {
+  flex-shrink: 0;
+}
+
+.console-setting-tabs .semi-tabs-content {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -ms-overflow-style: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--semi-color-fill-2) transparent;
+}
+
+.console-setting-tabs .semi-tabs-content::-webkit-scrollbar {
+  display: block !important;
+  width: 8px;
+}
+
+.console-setting-tabs .semi-tabs-content::-webkit-scrollbar-thumb {
+  background: var(--semi-color-fill-2);
+  border-radius: 4px;
+}
+
+.console-setting-tabs .semi-tabs-content::-webkit-scrollbar-thumb:hover {
+  background: var(--semi-color-fill-1);
+}
+
+.console-setting-tabs .semi-tabs-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.console-setting-tabs .semi-tabs-pane {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.console-setting-tabs .semi-tabs-pane > div {
+  height: auto !important;
+  overflow: visible !important;
 }
 
 /* 表格样式 */

@@ -61,13 +61,22 @@ const PageLayout = () => {
     '/pricing',
   ];
 
-  const shouldHideFooter = cardProPages.includes(location.pathname);
+  const shouldHideFooter =
+    cardProPages.includes(location.pathname) ||
+    location.pathname === '/' ||
+    location.pathname === '/console/playground' ||
+    location.pathname === '/console/chat-history' ||
+    location.pathname === '/console/setting';
 
   const isPricingRoute = location.pathname === '/pricing';
 
+  const isEmbeddedChatRoute = /^\/console\/chat(\/\d+)?$/.test(
+    location.pathname,
+  );
+
   const shouldInnerPadding =
     location.pathname.includes('/console') &&
-    !location.pathname.startsWith('/console/chat') &&
+    !isEmbeddedChatRoute &&
     location.pathname !== '/console/playground';
 
   const isConsoleRoute = location.pathname.startsWith('/console');
